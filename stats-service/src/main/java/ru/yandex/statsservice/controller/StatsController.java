@@ -9,6 +9,7 @@ import ru.yandex.statsservice.dto.Stat;
 import ru.yandex.statsservice.service.StatsService;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.util.List;
 
@@ -27,7 +28,7 @@ public class StatsController {
     @GetMapping("/stats")
     public List<Stat> get(@RequestParam(name = "start") @NotNull String start,
                           @RequestParam(name = "end") @NotNull String end,
-                          @RequestParam(name = "uris")List<String> uris,
+                          @RequestParam(name = "uris") @NotEmpty List<String> uris,
                           @RequestParam(name = "unique", defaultValue = "false") boolean unique) {
         return statsService.getHits(start, end, uris, unique);
     }

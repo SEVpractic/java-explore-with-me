@@ -11,6 +11,8 @@ import ru.yandex.statsservice.dto.Stat;
 import ru.yandex.statsservice.storage.StatsRepo;
 import ru.yandex.statsservice.util.HitMapper;
 
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -39,8 +41,10 @@ public class StatsServiceImpl implements StatsService {
 
         if (unique) {
             stat = getUniqueIpStat(startTime, endTime, uris);
+            log.info("сформирована статистика запросов по uris ={} для уникальных ip", uris);
         } else {
             stat = getNotUniqueIpStat(startTime, endTime, uris);
+            log.info("сформирована статистика запросов по uris ={} для не уникальных ip", uris);
         }
 
         return stat;
@@ -56,9 +60,8 @@ public class StatsServiceImpl implements StatsService {
 
     private LocalDateTime decodeAndParse(String time) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        String decodeTime = URLDecoder.decode(time, StandardCharsets.UTF_8);
 
-        //String encodeStart = URLEncoder.encode(start, StandardCharsets.UTF_8); // todo реализовать декодирование
-
-        return LocalDateTime.parse(time, formatter);
+        return LocalDateTime.parse(decodeTime, formatter);
     }
 }
