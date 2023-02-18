@@ -9,7 +9,7 @@ services:
     depends_on:
       - stats-db
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://localhost:5432/explore_with_me_database
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://stats-db:5432/explore_with_me_database
 
   stats-db:
     image: postgres:14-alpine
@@ -33,7 +33,7 @@ services:
       - stats-server
       - ewm-db
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://localhost:5432/explore_with_me_main_database
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://ewm-db:5432/explore_with_me_main_database
 
   ewm-db:
     image: postgres:14-alpine
