@@ -2,6 +2,7 @@ package ru.practicum.statsservice.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.statsdto.dto.HitDto;
@@ -21,6 +22,7 @@ public class StatsController {
     private final StatsService statsService;
 
     @PostMapping("/hit")
+    @ResponseStatus(value = HttpStatus.CREATED)
     public void save(@Valid @RequestBody HitDto dto) {
         statsService.saveRequest(dto);
     }
