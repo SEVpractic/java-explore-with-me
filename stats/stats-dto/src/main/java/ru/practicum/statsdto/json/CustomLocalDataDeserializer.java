@@ -1,6 +1,5 @@
 package ru.practicum.statsdto.json;
 
-import com.fasterxml.jackson.core.JacksonException;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
@@ -21,7 +20,7 @@ public class CustomLocalDataDeserializer extends StdDeserializer<LocalDateTime> 
 
     @Override
     public LocalDateTime deserialize(JsonParser jsonParser, DeserializationContext context)
-            throws IOException, JacksonException {
+            throws IOException {
         String value = jsonParser.getText();
         if (!"".equals(value)) {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");

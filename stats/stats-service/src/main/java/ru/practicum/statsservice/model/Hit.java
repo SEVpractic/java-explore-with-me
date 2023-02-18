@@ -13,18 +13,18 @@ import java.time.LocalDateTime;
 @Getter
 @NamedNativeQueries({
         @NamedNativeQuery(name = "GetNotUniqueIpStat", resultSetMapping = "HitToDtoMapping",
-                query = "select h.app, h.uri, count(h.ip) as hits " +
-                        "from hits as h " +
+                query = "select a.app_name as app, h.uri, count(h.ip) as hits " +
+                        "from hits as h join apps a on h.app_id = a.app_id " +
                         "where (h.timeStamp between :start and :end) " +
                         "and (h.uri in :uris) " +
-                        "group by h.app, h.uri order by hits desc "
+                        "group by h.uri, a.app_name order by hits desc "
                 ),
         @NamedNativeQuery(name = "GetUniqueIpStat", resultSetMapping = "HitToDtoMapping",
-                query = "select h.app, h.uri, count(distinct h.ip) as hits " +
-                        "from hits as h " +
+                query = "select a.app_name as app, h.uri, count(distinct h.ip) as hits " +
+                        "from hits as h join apps a on h.app_id = a.app_id " +
                         "where (h.timeStamp between :start and :end) " +
                         "and (h.uri in :uris) " +
-                        "group by h.app, h.uri order by hits desc "
+                        "group by h.uri, a.app_name order by hits desc "
         )
 })
 @SqlResultSetMapping(name = "HitToDtoMapping",
@@ -43,8 +43,9 @@ public class Hit {
     @Column(name = "hit_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(name = "app")
-    private String app;
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "app_id")
+    private App app;
     @Column(name = "uri")
     private String uri;
     @Column(name = "ip")

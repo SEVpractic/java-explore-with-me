@@ -1,15 +1,17 @@
 package ru.practicum.statsservice.service;
 
 import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.statsdto.dto.HitDto;
 import ru.practicum.statsdto.dto.Stat;
+import ru.practicum.statsservice.model.App;
+import ru.practicum.statsservice.storage.AppRepo;
 import ru.practicum.statsservice.storage.StatsRepo;
 import ru.practicum.statsservice.util.HitMapper;
+import ru.practicum.statsservice.util.AppMapper;
 import ru.practicum.statsservice.util.exception.InvalidPeriodException;
 
 import java.net.URLDecoder;
@@ -21,19 +23,20 @@ import java.util.List;
 @Service
 @Slf4j
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
-@Transactional(readOnly = true)
+@Transactional
 public class StatsServiceImpl implements StatsService {
+    private final AppRepo appRepo;
     private final StatsRepo statsRepo;
 
     @Override
-    @Transactional
     public void saveRequest(HitDto dto) {
-        statsRepo.save(HitMapper.toHit(dto));
+        App app = getOrCreate(dto);
+
+        statsRepo.save(HitMapper.toHit(dto, app));
         log.info("сохранен запрос ip = {} по url = {}", dto.getIp(), dto.getUri());
     }
 
     @Override
-    @SneakyThrows
     public List<Stat> getHits(String start, String end, List<String> uris, boolean unique) {
         List<Stat> stat;
 
@@ -50,6 +53,11 @@ public class StatsServiceImpl implements StatsService {
         }
 
         return stat;
+    }
+
+    private App getOrCreate(HitDto dto) {
+        return appRepo.findByName(dto.getApp())
+                .orElseGet(() -> appRepo.save(AppMapper.toApp(dto)));
     }
 
     private List<Stat> getNotUniqueIpStat(LocalDateTime start, LocalDateTime end, List<String> uris) {
