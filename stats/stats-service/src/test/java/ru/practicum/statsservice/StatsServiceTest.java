@@ -11,10 +11,11 @@ import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
-import ru.practicum.statsdto.dto.HitDto;
+import ru.practicum.statsdto.HitDto;
 
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
+import java.util.List;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -54,11 +55,11 @@ class StatsServiceTest {
 
     @SneakyThrows
     @Test
-    @Sql(value = {"/test-hits-creating.sql" })
+    @Sql(value = {"/test-schema.sql", "/test-hits-creating.sql" })
     @Order(1)
     void statReturningNotUniqueIpTest() {
-        String start = "2021-09-06%2011%3A00%3A23";
-        String end = "2023-09-06%2011%3A00%3A23";
+        String start = "2021-09-06 11:00:23";
+        String end = "2024-09-06 11:00:23";
         String uris = "/events/1";
 
         mockMvc.perform(get("/stats?start={start}&end={end}&uris={uris}", start, end, uris))
@@ -66,7 +67,7 @@ class StatsServiceTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].app").value("ewm-main-service"))
                 .andExpect(jsonPath("$[0].uri").value("/events/1"))
-                .andExpect(jsonPath("$[0].hits").value(3));
+                .andExpect(jsonPath("$[0].hits").value(2));
     }
 
     private HitDto createHit() {

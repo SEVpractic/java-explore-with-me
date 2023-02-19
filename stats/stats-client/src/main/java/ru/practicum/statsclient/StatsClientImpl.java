@@ -6,8 +6,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import ru.practicum.statsdto.dto.HitDto;
-import ru.practicum.statsdto.dto.Stat;
+import ru.practicum.statsdto.HitDto;
+import ru.practicum.statsdto.Stat;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;

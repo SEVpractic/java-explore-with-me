@@ -1,7 +1,7 @@
 package ru.practicum.statsservice.util;
 
 import lombok.experimental.UtilityClass;
-import ru.practicum.statsdto.dto.HitDto;
+import ru.practicum.statsdto.HitDto;
 import ru.practicum.statsservice.model.App;
 
 @UtilityClass

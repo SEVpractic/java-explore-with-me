@@ -2,7 +2,7 @@ package ru.practicum.statsservice.model;
 
 import lombok.Getter;
 import lombok.Setter;
-import ru.practicum.statsdto.dto.Stat;
+import ru.practicum.statsdto.Stat;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;

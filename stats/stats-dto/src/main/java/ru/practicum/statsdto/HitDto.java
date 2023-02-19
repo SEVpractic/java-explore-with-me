@@ -1,12 +1,9 @@
-package ru.practicum.statsdto.dto;
+package ru.practicum.statsdto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.Builder;
 import lombok.Getter;
-import ru.practicum.statsdto.json.CustomLocalDataDeserializer;
-import ru.practicum.statsdto.json.CustomLocalDataSerializer;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -22,8 +19,7 @@ public class HitDto {
     @NotBlank
     private final String ip;
     @NotNull
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     @JsonProperty("timestamp")
-    @JsonDeserialize(using = CustomLocalDataDeserializer.class)
-    @JsonSerialize(using = CustomLocalDataSerializer.class)
     private final LocalDateTime timeStamp;
 }

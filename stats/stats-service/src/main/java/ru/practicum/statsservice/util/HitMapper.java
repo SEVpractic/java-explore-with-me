@@ -1,8 +1,8 @@
 package ru.practicum.statsservice.util;
 
 import lombok.experimental.UtilityClass;
-import ru.practicum.statsdto.dto.HitDto;
-import ru.practicum.statsdto.dto.HitOutputDto;
+import ru.practicum.statsdto.HitDto;
+import ru.practicum.statsdto.HitOutputDto;
 import ru.practicum.statsservice.model.App;
 import ru.practicum.statsservice.model.Hit;
 

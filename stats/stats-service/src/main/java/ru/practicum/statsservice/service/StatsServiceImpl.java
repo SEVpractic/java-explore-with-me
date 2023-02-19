@@ -5,9 +5,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.practicum.statsdto.dto.HitDto;
-import ru.practicum.statsdto.dto.HitOutputDto;
-import ru.practicum.statsdto.dto.Stat;
+import ru.practicum.statsdto.HitDto;
+import ru.practicum.statsdto.HitOutputDto;
+import ru.practicum.statsdto.Stat;
 import ru.practicum.statsservice.model.App;
 import ru.practicum.statsservice.model.Hit;
 import ru.practicum.statsservice.storage.AppRepo;
@@ -16,10 +16,7 @@ import ru.practicum.statsservice.util.AppMapper;
 import ru.practicum.statsservice.util.HitMapper;
 import ru.practicum.statsservice.util.exception.InvalidPeriodException;
 
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Service
@@ -41,18 +38,10 @@ public class StatsServiceImpl implements StatsService {
     }
 
     @Override
-    public List<Stat> getHits(String start, String end, List<String> uris, boolean unique) {
-        List<Stat> stat;
+    public List<Stat> getHits(LocalDateTime start, LocalDateTime end, List<String> uris, boolean unique) {
+        checkPeriod(start, end);
 
-        LocalDateTime startTime = decodeAndParse(start);
-        LocalDateTime endTime = decodeAndParse(end);
-        checkPeriod(startTime, endTime);
-
-        stat = get(startTime, endTime, uris, unique);
-
-
-
-        return stat;
+        return get(start, end, uris, unique);
     }
 
     private App getOrCreate(HitDto dto) {
@@ -61,7 +50,7 @@ public class StatsServiceImpl implements StatsService {
     }
 
     private List<Stat> get(LocalDateTime start, LocalDateTime end, List<String> uris, boolean unique) {
-        if (uris.stream().anyMatch(uri -> uri.equals("/events"))) {
+        if (uris.stream().anyMatch(uri -> uri.equals("/events")) || uris.isEmpty()) {
             if (unique) {
                 log.info("сформирована статистика запросов по uris ={} для уникальных ip", uris);
                 return statsRepo.getUniqueIpStatNoUri(start, end);
@@ -78,13 +67,6 @@ public class StatsServiceImpl implements StatsService {
                 return statsRepo.getNotUniqueIpStat(start, end, uris);
             }
         }
-    }
-
-    private LocalDateTime decodeAndParse(String time) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        String decodeTime = URLDecoder.decode(time, StandardCharsets.UTF_8);
-
-        return LocalDateTime.parse(decodeTime, formatter);
     }
 
     private void checkPeriod(LocalDateTime start, LocalDateTime end) {
