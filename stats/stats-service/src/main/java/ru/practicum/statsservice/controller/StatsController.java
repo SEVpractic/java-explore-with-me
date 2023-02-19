@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.statsdto.dto.HitDto;
+import ru.practicum.statsdto.dto.HitOutputDto;
 import ru.practicum.statsdto.dto.Stat;
 import ru.practicum.statsservice.service.StatsService;
 
@@ -23,8 +24,8 @@ public class StatsController {
 
     @PostMapping("/hit")
     @ResponseStatus(value = HttpStatus.CREATED)
-    public void save(@Valid @RequestBody HitDto dto) {
-        statsService.saveRequest(dto);
+    public HitOutputDto save(@Valid @RequestBody HitDto dto) {
+        return statsService.saveRequest(dto);
     }
 
     @GetMapping("/stats")

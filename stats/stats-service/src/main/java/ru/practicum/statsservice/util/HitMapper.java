@@ -2,6 +2,7 @@ package ru.practicum.statsservice.util;
 
 import lombok.experimental.UtilityClass;
 import ru.practicum.statsdto.dto.HitDto;
+import ru.practicum.statsdto.dto.HitOutputDto;
 import ru.practicum.statsservice.model.App;
 import ru.practicum.statsservice.model.Hit;
 
@@ -16,5 +17,15 @@ public class HitMapper {
         hit.setTimeStamp(dto.getTimeStamp());
 
         return hit;
+    }
+
+    public static HitOutputDto toOutputDto(Hit hit) {
+        return HitOutputDto.builder()
+                .id(hit.getId())
+                .app(hit.getApp().getName())
+                .uri(hit.getUri())
+                .ip(hit.getIp())
+                .timeStamp(hit.getTimeStamp())
+                .build();
     }
 }

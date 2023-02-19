@@ -25,7 +25,19 @@ import java.time.LocalDateTime;
                         "where (h.timeStamp between :start and :end) " +
                         "and (h.uri in :uris) " +
                         "group by h.uri, a.app_name order by hits desc "
-        )
+                ),
+        @NamedNativeQuery(name = "GetNotUniqueIpStatNoUri", resultSetMapping = "HitToDtoMapping",
+                query = "select a.app_name as app, h.uri, count(h.ip) as hits " +
+                        "from hits as h join apps a on h.app_id = a.app_id " +
+                        "where (h.timeStamp between :start and :end) " +
+                        "group by h.uri, a.app_name order by hits desc "
+                ),
+        @NamedNativeQuery(name = "GetUniqueIpStatNoUri", resultSetMapping = "HitToDtoMapping",
+                query = "select a.app_name as app, h.uri, count(distinct h.ip) as hits " +
+                        "from hits as h join apps a on h.app_id = a.app_id " +
+                        "where (h.timeStamp between :start and :end) " +
+                        "group by h.uri, a.app_name order by hits desc "
+                )
 })
 @SqlResultSetMapping(name = "HitToDtoMapping",
         classes = {
