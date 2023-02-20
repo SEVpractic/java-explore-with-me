@@ -13,12 +13,14 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Formatter;
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class StatsClientImpl implements StatsClient {
+    private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
     @Value("${stats-client.uri}")
     private final String uri;
 
@@ -35,7 +37,6 @@ public class StatsClientImpl implements StatsClient {
     }
 
     private String encodeTime(LocalDateTime time) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         String str = time.format(formatter);
         return URLEncoder.encode(str, StandardCharsets.UTF_8);
     }
