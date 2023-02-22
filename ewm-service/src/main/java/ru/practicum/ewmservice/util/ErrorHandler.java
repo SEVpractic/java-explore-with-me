@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
+import ru.practicum.ewmservice.util.exceptions.EntityNotExistException;
 
 import javax.validation.ConstraintViolationException;
 
@@ -64,5 +65,11 @@ public class ErrorHandler extends ResponseEntityExceptionHandler {
     private ResponseEntity<Object> handleIllegalArgumentException(IllegalArgumentException ex) {
         log.info("400 {}", ex.getMessage());
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler ResponseEntity<Object> handleEntityNotExistException(EntityNotExistException ex) {
+        log.info("404 {}", ex.getMessage());
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
+
     }
 }
