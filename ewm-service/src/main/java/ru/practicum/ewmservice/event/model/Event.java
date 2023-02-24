@@ -3,10 +3,12 @@ package ru.practicum.ewmservice.event.model;
 import lombok.Getter;
 import lombok.Setter;
 import ru.practicum.ewmservice.categories.model.Category;
+import ru.practicum.ewmservice.participation_request.model.EventRequest;
 import ru.practicum.ewmservice.users.model.User;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "events")

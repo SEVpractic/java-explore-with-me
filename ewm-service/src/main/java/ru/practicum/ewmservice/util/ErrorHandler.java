@@ -13,6 +13,7 @@ import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 import ru.practicum.ewmservice.util.exceptions.EntityNotExistException;
+import ru.practicum.ewmservice.util.exceptions.OperationFaildException;
 
 import javax.validation.ConstraintViolationException;
 
@@ -67,9 +68,15 @@ public class ErrorHandler extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler ResponseEntity<Object> handleEntityNotExistException(EntityNotExistException ex) {
+    @ExceptionHandler
+    private ResponseEntity<Object> handleEntityNotExistException(EntityNotExistException ex) {
         log.info("404 {}", ex.getMessage());
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
+    }
 
+    @ExceptionHandler
+    private ResponseEntity<Object> handleOperationFaildException(OperationFaildException ex) {
+        log.info("409 {}", ex.getMessage());
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.CONFLICT);
     }
 }
