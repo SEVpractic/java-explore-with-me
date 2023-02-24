@@ -31,6 +31,6 @@ public interface EventService {
 
     List<EventRequestDto> getRequests(long userId, long eventId);
 
-    List<EventRequestDto> processRequests(long userId, long eventId, ProcessRequestsDto dto);
+    ProcessRequestResultDto processRequests(long userId, long eventId, ProcessRequestsDto dto);
 
 }

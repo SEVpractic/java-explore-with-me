@@ -6,10 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Repository;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.ewmservice.event.dto.EventFullDto;
-import ru.practicum.ewmservice.event.dto.EventIncomeDto;
-import ru.practicum.ewmservice.event.dto.EventShortDto;
-import ru.practicum.ewmservice.event.dto.ProcessRequestsDto;
+import ru.practicum.ewmservice.event.dto.*;
 import ru.practicum.ewmservice.event.service.EventService;
 import ru.practicum.ewmservice.participation_request.dto.EventRequestDto;
 import ru.practicum.ewmservice.util.validation.CreateValidationGroup;
@@ -59,9 +56,9 @@ public class EventPrivateController {
     }
 
     @PatchMapping("{eventId}/requests")
-    public List<EventRequestDto> processRequests(@PathVariable("userId") long userId,
-                                @PathVariable("eventId") long eventId,
-                                @Valid @RequestBody ProcessRequestsDto dto) {
+    public ProcessRequestResultDto processRequests(@PathVariable("userId") long userId,
+                                                   @PathVariable("eventId") long eventId,
+                                                   @Valid @RequestBody ProcessRequestsDto dto) {
         return eventService.processRequests(userId, eventId, dto);
     }
 }

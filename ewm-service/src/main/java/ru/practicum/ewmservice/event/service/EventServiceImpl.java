@@ -31,6 +31,7 @@ import ru.practicum.ewmservice.util.exceptions.OperationFaildException;
 import ru.practicum.ewmservice.util.mappers.EventMapper;
 import ru.practicum.ewmservice.util.mappers.EventRequestMapper;
 import ru.practicum.ewmservice.util.mappers.LocationMapper;
+import ru.practicum.ewmservice.util.mappers.ProcessRequestResulMapper;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -170,13 +171,13 @@ public class EventServiceImpl implements EventService {
 
     @Override
     @Transactional
-    public List<EventRequestDto> processRequests(long userId, long eventId, ProcessRequestsDto dto) {
+    public ProcessRequestResultDto processRequests(long userId, long eventId, ProcessRequestsDto dto) {
         User user = findUserOrThrow(userId);
         Event event = findEventOrThrow(eventId);
         checkInitiator(user, event);
 
         List<EventRequest> requests = findEventRequestsByIds(dto.getRequestIds());
-        if (requests.isEmpty()) return List.of();
+        if (requests.isEmpty()) return ProcessRequestResultDto.builder().build();
         requests = filterRequestsByStat(requests);
 
         switch (dto.getStatus()) {
@@ -188,7 +189,7 @@ public class EventServiceImpl implements EventService {
                 break;
         }
 
-        return EventRequestMapper.toEventRequestDto(requests);
+        return ProcessRequestResulMapper.toDto(requests);
         //todo если для события лимит заявок равен 0 или отключена пре-модерация заявок, то подтверждение заявок не требуется
         //todo нельзя подтвердить заявку, если уже достигнут лимит по заявкам на данное событие (Ожидается код ошибки 409)
         //todo статус можно изменить только у заявок, находящихся в состоянии ожидания (Ожидается код ошибки 409)
