@@ -60,6 +60,12 @@ public class EventAdminServiceImpl extends EventSuperService implements EventAdm
                                      int from, int size) {
         List<Event> events;
 
+        if (states.isEmpty()) {
+            states.add(EventStates.PENDING);
+            states.add(EventStates.PUBLISHED);
+            states.add(EventStates.CANCELED);
+        }
+
         Pageable pageable = createPageableBySort(EventSorts.EVENT_DATE, from, size);
         events = findByUsersAndStates(userIds, states.stream().map(Enum::name).collect(Collectors.toList()),
                 categories, rangeStart, rangeEnd, pageable);

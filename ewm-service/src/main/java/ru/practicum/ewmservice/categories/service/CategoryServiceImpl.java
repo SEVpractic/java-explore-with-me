@@ -17,6 +17,7 @@ import ru.practicum.ewmservice.participation_request.storage.EventRequestRepo;
 import ru.practicum.ewmservice.participation_request.storage.EventRequestStatsRepo;
 import ru.practicum.ewmservice.user.storage.UserRepo;
 import ru.practicum.ewmservice.util.UtilService;
+import ru.practicum.ewmservice.util.exceptions.OperationFailedException;
 import ru.practicum.ewmservice.util.mappers.CategoryMapper;
 
 import java.util.List;
@@ -55,7 +56,8 @@ public class CategoryServiceImpl extends UtilService implements CategoryService{
 
     @Override
     public void delete(long catId) {
-        findCategoryOrThrow(catId);
+        Category category = findCategoryOrThrow(catId);
+        checkDeleteAvailable(category);
         categoryRepo.deleteById(catId);
         log.info("Удален пользователь c id = {} ", catId);
     }
@@ -85,5 +87,14 @@ public class CategoryServiceImpl extends UtilService implements CategoryService{
 
     private Category save(CategoryDto dto) {
         return categoryRepo.save(CategoryMapper.toCategory(dto));
+    }
+
+    private void checkDeleteAvailable(Category category) {
+        if (eventRepo.findAllByCategory(category).size() != 0) {
+            throw new OperationFailedException(
+                    String.format("Невозможно удалить категорию id = %s. Существуют события, связанные с категорией",
+                            category.getId())
+            );
+        }
     }
 }

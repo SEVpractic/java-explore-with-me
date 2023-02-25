@@ -21,7 +21,7 @@ import ru.practicum.ewmservice.participation_request.storage.EventRequestRepo;
 import ru.practicum.ewmservice.participation_request.storage.EventRequestStatsRepo;
 import ru.practicum.ewmservice.user.model.User;
 import ru.practicum.ewmservice.user.storage.UserRepo;
-import ru.practicum.ewmservice.util.exceptions.OperationFaildException;
+import ru.practicum.ewmservice.util.exceptions.OperationFailedException;
 import ru.practicum.ewmservice.util.mappers.EventMapper;
 import ru.practicum.ewmservice.util.mappers.EventRequestMapper;
 import ru.practicum.ewmservice.util.mappers.LocationMapper;
@@ -66,15 +66,13 @@ public class EventPrivateServiceImpl extends EventSuperService implements EventP
 
     @Override
     @Transactional
-    public EventFullDto privateUpdate(EventIncomeDto dto, long userId, long eventId) {
-        findUserOrThrow(userId);
+    public EventFullDto update(EventIncomeDto dto, long userId, long eventId) {
+        User user = findUserOrThrow(userId);
         Event event = findEventOrThrow(eventId);
 
-        if (event.getInitiator().getId() != userId) {
-            throw new OperationFaildException(
-                    "Только создатель и администратор имею право редактировать событие"
-            );
-        }
+        checkInitiator(user, event);
+        checkUpdateAvailable(event);
+
         event = update(event, dto);
         log.info("Обновлено событие c id = {} юзером с id = {}", eventId, userId);
 
@@ -120,6 +118,7 @@ public class EventPrivateServiceImpl extends EventSuperService implements EventP
         User user = findUserOrThrow(userId);
         Event event = findEventOrThrow(eventId);
         checkInitiator(user, event);
+        checkProcessRequestsAvailable(event);
 
         List<EventRequest> requests = findEventRequestsByIds(dto.getRequestIds());
         if (requests.isEmpty()) return ProcessRequestResultDto.builder().build();
@@ -147,11 +146,13 @@ public class EventPrivateServiceImpl extends EventSuperService implements EventP
         } else {
             int limit = event.getParticipantLimit() - event.getConfirmedRequests();
 
-            if (requests.size() < limit) {
+            if (requests.size() <= limit) {
                 confirmRequests(requests, event);
-            } else {
+            } else if (limit > 0) {
                 confirmRequests(requests.subList(0, limit - 1), event);
                 rejectRequests(requests.subList(limit, requests.size()));
+            } else {
+                rejectRequests(requests);
             }
         }
     }
@@ -183,8 +184,24 @@ public class EventPrivateServiceImpl extends EventSuperService implements EventP
 
     private void checkInitiator(User user, Event event) {
         if (event.getInitiator().getId() != user.getId()) {
-            throw new OperationFaildException(
-                    "только инициатор события может работать с запросами"
+            throw new OperationFailedException(
+                    "Только создатель имеет право редактировать событие и получать запросы на участие"
+            );
+        }
+    }
+
+    private void checkUpdateAvailable(Event event) {
+        if (event.getState().getName().equals(EventStates.PUBLISHED.name())) {
+            throw new OperationFailedException(
+                    "изменить можно только отмененные события или события в состоянии ожидания модерации "
+            );
+        }
+    }
+
+    private void checkProcessRequestsAvailable(Event event) {
+        if (event.getParticipantLimit() - event.getConfirmedRequests() == 0) {
+            throw new OperationFailedException(
+                    "нельзя подтвердить заявку, если уже достигнут лимит по заявкам на данное событие "
             );
         }
     }

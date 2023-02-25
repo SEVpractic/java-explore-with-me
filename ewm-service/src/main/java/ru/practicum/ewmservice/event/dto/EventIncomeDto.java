@@ -6,7 +6,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Getter;
 import ru.practicum.ewmservice.util.validation.CreateValidationGroup;
-import ru.practicum.ewmservice.util.validation.EventDateValidation;
+import ru.practicum.ewmservice.util.validation.EventDateCreateValidation;
+import ru.practicum.ewmservice.util.validation.EventDateUpdateValidation;
 import ru.practicum.ewmservice.util.validation.UpdateValidationGroup;
 
 import javax.validation.constraints.*;
@@ -23,7 +24,8 @@ public class EventIncomeDto {
     private final Long categoryId;
     @NotBlank(groups = CreateValidationGroup.class)
     private final String description;
-    @EventDateValidation(groups = {CreateValidationGroup.class})
+    @EventDateCreateValidation(groups = {CreateValidationGroup.class})
+    @EventDateUpdateValidation(groups = {UpdateValidationGroup.class})
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     @JsonProperty("eventDate")
     private final LocalDateTime eventDate;

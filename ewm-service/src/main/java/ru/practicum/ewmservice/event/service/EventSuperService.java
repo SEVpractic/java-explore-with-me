@@ -17,7 +17,7 @@ import ru.practicum.ewmservice.participation_request.storage.EventRequestRepo;
 import ru.practicum.ewmservice.participation_request.storage.EventRequestStatsRepo;
 import ru.practicum.ewmservice.user.storage.UserRepo;
 import ru.practicum.ewmservice.util.UtilService;
-import ru.practicum.ewmservice.util.exceptions.OperationFaildException;
+import ru.practicum.ewmservice.util.exceptions.OperationFailedException;
 import ru.practicum.ewmservice.util.mappers.LocationMapper;
 
 import java.time.LocalDateTime;
@@ -63,6 +63,9 @@ public class EventSuperService extends UtilService {
             case REJECT_EVENT:
                 updateToReject(event);
                 break;
+            case SEND_TO_REVIEW:
+                updateToPending(event);
+                break;
         }
     }
 
@@ -76,11 +79,11 @@ public class EventSuperService extends UtilService {
             event.setState(findEventStateOrThrow(EventStates.PUBLISHED));
             event.setPublishedOn(LocalDateTime.now());
         } else if (event.getEventDate().isBefore(LocalDateTime.now().plusHours(1))) {
-            throw new OperationFaildException(
+            throw new OperationFailedException(
                     "Невозможно опубликовать мероприятие, если время начала меньше чем через час"
             );
         } else if (event.getState().getId() != 1) {
-            throw new OperationFaildException(
+            throw new OperationFailedException(
                     "Невозможно опубликовать мероприятие, не ожидающее публикацию"
             );
         }
@@ -90,10 +93,14 @@ public class EventSuperService extends UtilService {
         if (!event.getState().getName().equals(EventStates.PUBLISHED.name())) {
             event.setState(findEventStateOrThrow(EventStates.CANCELED));
         } else {
-            throw new OperationFaildException(
+            throw new OperationFailedException(
                     "Невозможно отклонить опубликованное мероприятие"
             );
         }
+    }
+
+    public void updateToPending(Event event) {
+        event.setState(findEventStateOrThrow(EventStates.PENDING));
     }
 
     private void updateLocation(Event event, EventIncomeDto dto) {

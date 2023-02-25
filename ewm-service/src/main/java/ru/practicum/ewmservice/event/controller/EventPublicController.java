@@ -29,7 +29,7 @@ public class EventPublicController {
                                                 LocalDateTime rangeEnd,
                                             @RequestParam(name = "onlyAvailable", defaultValue = "false")
                                                 boolean onlyAvailable,
-                                            @RequestParam(name = "sort")EventSorts sort, // todo сделай конвертер
+                                            @RequestParam(name = "sort", defaultValue = "EVENT_DATE") EventSorts sort, // todo сделай конвертер
                                             @RequestParam(name = "from", defaultValue = "0") int from,
                                             @RequestParam(name = "size", defaultValue = "10") int size) {
         return eventPublicService.getAll(text, categories, paid, rangeStart, rangeEnd, onlyAvailable, sort, from, size);

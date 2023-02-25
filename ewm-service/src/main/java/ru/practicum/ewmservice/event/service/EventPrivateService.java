@@ -9,7 +9,7 @@ public interface EventPrivateService {
 
     EventFullDto create(EventIncomeDto dto, long userId);
 
-    EventFullDto privateUpdate(EventIncomeDto dto, long userId, long eventId);
+    EventFullDto update(EventIncomeDto dto, long userId, long eventId);
 
     List<EventShortDto> getAll(long userId);
 

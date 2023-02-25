@@ -32,9 +32,7 @@ public class EventPrivateController {
     public EventFullDto update(@Validated(UpdateValidationGroup.class) @RequestBody EventIncomeDto dto,
                                @PathVariable("userId") long userId,
                                @PathVariable("eventId") long eventId) {
-        // todo изменить можно только отмененные события или события в состоянии ожидания модерации (Ожидается код ошибки 409)
-        // todo дата и время на которые намечено событие не может быть раньше, чем через два часа от текущего момента (Ожидается код ошибки 409)
-        return eventService.privateUpdate(dto, userId, eventId);
+        return eventService.update(dto, userId, eventId);
     }
 
     @GetMapping

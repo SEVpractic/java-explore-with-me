@@ -28,7 +28,7 @@ public class EventAdminController {
 
     @GetMapping
     public List<EventFullDto> findByFilter(@RequestParam(name = "users") List<Long> userIds,
-                                           @RequestParam(name = "states") List<EventStates> states,
+                                           @RequestParam(name = "states", defaultValue = "") List<EventStates> states,
                                            @RequestParam(name = "categories") List<Long> categories,
                                            @RequestParam(name = "rangeStart", required = false)
                                                LocalDateTime rangeStart,

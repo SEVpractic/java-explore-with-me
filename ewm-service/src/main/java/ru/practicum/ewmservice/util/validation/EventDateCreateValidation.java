@@ -7,8 +7,8 @@ import java.lang.annotation.*;
 @Documented
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
-@Constraint(validatedBy = EventDateValidatior.class)
-public @interface EventDateValidation {
+@Constraint(validatedBy = EventDateCreateValidator.class)
+public @interface EventDateCreateValidation {
     String message() default "Время начала не может быть раньше чем через два часа после публикации";
 
     Class<?>[] groups() default {};
