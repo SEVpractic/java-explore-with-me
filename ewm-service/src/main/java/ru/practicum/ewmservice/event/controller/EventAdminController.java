@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.practicum.ewmservice.event.dto.EventFullDto;
 import ru.practicum.ewmservice.event.dto.EventIncomeDto;
 import ru.practicum.ewmservice.event.model.EventStates;
-import ru.practicum.ewmservice.event.service.EventService;
+import ru.practicum.ewmservice.event.service.EventAdminService;
 import ru.practicum.ewmservice.util.validation.UpdateValidationGroup;
 
 import java.time.LocalDateTime;
@@ -18,12 +18,12 @@ import java.util.List;
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 @Validated
 public class EventAdminController {
-    private final EventService eventService;
+    private final EventAdminService eventAdminServiceService;
 
     @PatchMapping(path = "/{eventId}")
     public EventFullDto update(@Validated(UpdateValidationGroup.class) @RequestBody EventIncomeDto dto,
                                @PathVariable("eventId") long eventId) {
-        return eventService.adminUpdate(dto, eventId);
+        return eventAdminServiceService.update(dto, eventId);
     }
 
     @GetMapping
@@ -36,6 +36,6 @@ public class EventAdminController {
                                                LocalDateTime rangeEnd,
                                            @RequestParam(name = "from", defaultValue = "0") int from,
                                            @RequestParam(name = "size", defaultValue = "10") int size) {
-        return eventService.getAllAdmin(userIds, states, categories, rangeStart, rangeEnd, from, size);
+        return eventAdminServiceService.getAll(userIds, states, categories, rangeStart, rangeEnd, from, size);
     }
 }

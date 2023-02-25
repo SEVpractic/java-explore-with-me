@@ -3,11 +3,10 @@ package ru.practicum.ewmservice.event.controller;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Repository;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.ewmservice.event.dto.*;
-import ru.practicum.ewmservice.event.service.EventService;
+import ru.practicum.ewmservice.event.service.EventPrivateService;
 import ru.practicum.ewmservice.participation_request.dto.EventRequestDto;
 import ru.practicum.ewmservice.util.validation.CreateValidationGroup;
 import ru.practicum.ewmservice.util.validation.UpdateValidationGroup;
@@ -20,7 +19,7 @@ import java.util.List;
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 @Validated
 public class EventPrivateController {
-    private final EventService eventService;
+    private final EventPrivateService eventService;
 
     @PostMapping
     @ResponseStatus(value = HttpStatus.CREATED)

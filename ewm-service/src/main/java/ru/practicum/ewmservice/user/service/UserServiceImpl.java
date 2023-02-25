@@ -1,28 +1,42 @@
-package ru.practicum.ewmservice.users.service;
+package ru.practicum.ewmservice.user.service;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.practicum.ewmservice.users.dto.UserDto;
-import ru.practicum.ewmservice.users.dto.UserIncomeDto;
-import ru.practicum.ewmservice.users.model.User;
-import ru.practicum.ewmservice.users.storage.UserRepo;
+import ru.practicum.ewmservice.categories.storage.CategoryRepo;
+import ru.practicum.ewmservice.compilation.storage.CompilationRepo;
+import ru.practicum.ewmservice.event.storage.EventRepo;
+import ru.practicum.ewmservice.event.storage.EventStateRepo;
+import ru.practicum.ewmservice.event.storage.LocationRepo;
+import ru.practicum.ewmservice.participation_request.storage.EventRequestRepo;
+import ru.practicum.ewmservice.participation_request.storage.EventRequestStatsRepo;
+import ru.practicum.ewmservice.user.dto.UserDto;
+import ru.practicum.ewmservice.user.dto.UserIncomeDto;
+import ru.practicum.ewmservice.user.model.User;
+import ru.practicum.ewmservice.user.storage.UserRepo;
+import ru.practicum.ewmservice.util.UtilService;
 import ru.practicum.ewmservice.util.mappers.UserMapper;
-import ru.practicum.ewmservice.util.exceptions.EntityNotExistException;
 
 import java.util.List;
 
 @Service
-@RequiredArgsConstructor(onConstructor_ = @Autowired)
 @Slf4j
 @Transactional(readOnly = true)
-public class UserServiceImpl implements UserService{
-    private final UserRepo userRepo;
+public class UserServiceImpl extends UtilService implements UserService{
+    public UserServiceImpl(UserRepo userRepo,
+                           EventRepo eventRepo,
+                           CategoryRepo categoryRepo,
+                           LocationRepo locationRepo,
+                           EventStateRepo eventStateRepo,
+                           CompilationRepo compilationRepo,
+                           EventRequestRepo eventRequestRepo,
+                           EventRequestStatsRepo eventRequestStatsRepo) {
+        super(userRepo, eventRepo, categoryRepo, locationRepo, eventStateRepo,
+                compilationRepo, eventRequestRepo, eventRequestStatsRepo);
+    }
 
     @Override
     @Transactional
@@ -56,15 +70,8 @@ public class UserServiceImpl implements UserService{
     @Override
     @Transactional
     public void delete(long userId) {
-        findOrThrow(userId);
+        findUserOrThrow(userId);
         userRepo.deleteById(userId);
         log.info("Удален пользователь c id = {} ", userId);
-    }
-
-    private User findOrThrow(long userId) {
-        return userRepo.findById(userId)
-                .orElseThrow(() -> new EntityNotExistException(
-                        String.format("Пользователь c id = %s не существует", userId))
-                );
     }
 }

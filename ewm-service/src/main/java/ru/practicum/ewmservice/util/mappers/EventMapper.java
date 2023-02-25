@@ -7,7 +7,7 @@ import ru.practicum.ewmservice.event.dto.EventIncomeDto;
 import ru.practicum.ewmservice.event.dto.EventShortDto;
 import ru.practicum.ewmservice.event.model.Event;
 import ru.practicum.ewmservice.event.model.Location;
-import ru.practicum.ewmservice.users.model.User;
+import ru.practicum.ewmservice.user.model.User;
 
 import java.util.List;
 import java.util.stream.Collectors;

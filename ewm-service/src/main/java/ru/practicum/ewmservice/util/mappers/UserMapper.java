@@ -1,9 +1,9 @@
 package ru.practicum.ewmservice.util.mappers;
 
 import lombok.experimental.UtilityClass;
-import ru.practicum.ewmservice.users.dto.UserDto;
-import ru.practicum.ewmservice.users.dto.UserIncomeDto;
-import ru.practicum.ewmservice.users.model.User;
+import ru.practicum.ewmservice.user.dto.UserDto;
+import ru.practicum.ewmservice.user.dto.UserIncomeDto;
+import ru.practicum.ewmservice.user.model.User;
 
 import java.util.List;
 import java.util.stream.Collectors;

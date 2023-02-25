@@ -1,36 +1,44 @@
 package ru.practicum.ewmservice.participation_request.service;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.practicum.ewmservice.categories.storage.CategoryRepo;
+import ru.practicum.ewmservice.compilation.storage.CompilationRepo;
 import ru.practicum.ewmservice.event.model.Event;
 import ru.practicum.ewmservice.event.storage.EventRepo;
+import ru.practicum.ewmservice.event.storage.EventStateRepo;
+import ru.practicum.ewmservice.event.storage.LocationRepo;
 import ru.practicum.ewmservice.participation_request.dto.EventRequestDto;
 import ru.practicum.ewmservice.participation_request.dto.EventRequestStats;
 import ru.practicum.ewmservice.participation_request.model.EventRequest;
-import ru.practicum.ewmservice.participation_request.model.EventRequestStat;
 import ru.practicum.ewmservice.participation_request.storage.EventRequestRepo;
 import ru.practicum.ewmservice.participation_request.storage.EventRequestStatsRepo;
-import ru.practicum.ewmservice.users.model.User;
-import ru.practicum.ewmservice.users.storage.UserRepo;
-import ru.practicum.ewmservice.util.exceptions.EntityNotExistException;
+import ru.practicum.ewmservice.user.model.User;
+import ru.practicum.ewmservice.user.storage.UserRepo;
 import ru.practicum.ewmservice.util.exceptions.OperationFaildException;
 import ru.practicum.ewmservice.util.mappers.EventRequestMapper;
+import ru.practicum.ewmservice.util.UtilService;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
-@RequiredArgsConstructor(onConstructor_ = @Autowired)
 @Slf4j
 @Transactional(readOnly = true)
-public class EventRequestServiceImpl implements EventRequestService {
-    private final EventRequestRepo eventRequestRepo;
-    private final UserRepo userRepo;
-    private final EventRepo eventRepo;
-    private final EventRequestStatsRepo eventRequestStatsRepo;
+public class EventRequestServiceImpl extends UtilService implements EventRequestService {
+
+    public EventRequestServiceImpl(UserRepo userRepo,
+                                   EventRepo eventRepo,
+                                   CategoryRepo categoryRepo,
+                                   LocationRepo locationRepo,
+                                   EventStateRepo eventStateRepo,
+                                   CompilationRepo compilationRepo,
+                                   EventRequestRepo eventRequestRepo,
+                                   EventRequestStatsRepo eventRequestStatsRepo) {
+        super(userRepo, eventRepo, categoryRepo, locationRepo, eventStateRepo,
+                compilationRepo, eventRequestRepo, eventRequestStatsRepo);
+    }
 
     @Override
     @Transactional
@@ -117,33 +125,5 @@ public class EventRequestServiceImpl implements EventRequestService {
                     "только инициатор запроса может отменить свой запрос"
             );
         }
-    }
-
-    private EventRequestStat findStatOrThrow(EventRequestStats stat) {
-        return eventRequestStatsRepo.findByName(stat.name())
-                .orElseThrow(() -> new EntityNotExistException(
-                        String.format("Статус {} не существует", stat))
-                );
-    }
-
-    private User findUserOrThrow(long userId) {
-        return userRepo.findById(userId)
-                .orElseThrow(() -> new EntityNotExistException(
-                        String.format("Пользователь c id = %s не существует", userId))
-                );
-    }
-
-    private Event findEventOrThrow(long eventId) {
-        return eventRepo.findById(eventId)
-                .orElseThrow(() -> new EntityNotExistException(
-                        String.format("Событие с id = %s не существует", eventId))
-                );
-    }
-
-    private EventRequest findEventRequestOrThrow(long requestId) {
-        return eventRequestRepo.findById(requestId)
-                .orElseThrow(() -> new EntityNotExistException(
-                        String.format("Запрос на участие с id = %s не существует", requestId))
-                );
     }
 }

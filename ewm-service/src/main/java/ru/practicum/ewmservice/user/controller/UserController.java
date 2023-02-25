@@ -1,13 +1,13 @@
-package ru.practicum.ewmservice.users.controller;
+package ru.practicum.ewmservice.user.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.ewmservice.users.dto.UserDto;
-import ru.practicum.ewmservice.users.dto.UserIncomeDto;
-import ru.practicum.ewmservice.users.service.UserService;
+import ru.practicum.ewmservice.user.dto.UserDto;
+import ru.practicum.ewmservice.user.dto.UserIncomeDto;
+import ru.practicum.ewmservice.user.service.UserService;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Positive;

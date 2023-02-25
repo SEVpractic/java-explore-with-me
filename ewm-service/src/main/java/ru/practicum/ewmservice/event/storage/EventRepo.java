@@ -5,11 +5,12 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import ru.practicum.ewmservice.event.model.Event;
-import ru.practicum.ewmservice.users.model.User;
+import ru.practicum.ewmservice.user.model.User;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Repository
 public interface EventRepo extends JpaRepository<Event, Long> {
@@ -111,4 +112,6 @@ public interface EventRepo extends JpaRepository<Event, Long> {
             "and e.eventDate > current_timestamp ")
     List<Event> findEventsByUsers(List<Long> userIds, List<String> states, List<Long> categories,
                                   Pageable pageable);
+
+    Set<Event> findByIdIn(List<Long> ids);
 }

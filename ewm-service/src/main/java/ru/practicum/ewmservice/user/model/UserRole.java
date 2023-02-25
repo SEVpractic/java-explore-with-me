@@ -1,4 +1,4 @@
-package ru.practicum.ewmservice.users.model;
+package ru.practicum.ewmservice.user.model;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -6,16 +6,14 @@ import lombok.Setter;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "users")
+@Table(name = "users_roles")
 @Setter
 @Getter
-public class User {
+public class UserRole { // todo удалить или реализовать
     @Id
     @Column(name = "user_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(name = "name")
-    private String name;
-    @Column(name = "email", unique = true)
-    private String email;
+    @Column(name = "role")
+    private UserRoles role;
 }

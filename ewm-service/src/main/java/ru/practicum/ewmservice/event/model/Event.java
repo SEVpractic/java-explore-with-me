@@ -3,12 +3,12 @@ package ru.practicum.ewmservice.event.model;
 import lombok.Getter;
 import lombok.Setter;
 import ru.practicum.ewmservice.categories.model.Category;
-import ru.practicum.ewmservice.participation_request.model.EventRequest;
-import ru.practicum.ewmservice.users.model.User;
+import ru.practicum.ewmservice.compilation.model.Compilation;
+import ru.practicum.ewmservice.user.model.User;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
-import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "events")
@@ -53,4 +53,6 @@ public class Event {
     private String title; // Заголовок
     @Column(name = "views")
     private int views;
+    @ManyToMany(mappedBy = "events")
+    private Set<Compilation> compilations; // Подборки
 }
