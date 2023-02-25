@@ -51,6 +51,7 @@ public class EventPrivateServiceImpl extends EventSuperService implements EventP
     @Override
     @Transactional
     public EventFullDto create(EventIncomeDto dto, long userId) {
+        checkEventDate(dto, 2);
         User initiator = findUserOrThrow(userId);
         Category category = findCategoryOrThrow(dto.getCategoryId());
         Location location = findLocationOrSave(LocationMapper.toLocation(dto));
@@ -67,6 +68,7 @@ public class EventPrivateServiceImpl extends EventSuperService implements EventP
     @Override
     @Transactional
     public EventFullDto update(EventIncomeDto dto, long userId, long eventId) {
+        checkEventDate(dto, 2);
         User user = findUserOrThrow(userId);
         Event event = findEventOrThrow(eventId);
 

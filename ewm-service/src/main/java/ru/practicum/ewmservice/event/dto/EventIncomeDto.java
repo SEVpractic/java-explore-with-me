@@ -24,8 +24,6 @@ public class EventIncomeDto {
     private final Long categoryId;
     @NotBlank(groups = CreateValidationGroup.class)
     private final String description;
-    @EventDateCreateValidation(groups = {CreateValidationGroup.class})
-    @EventDateUpdateValidation(groups = {UpdateValidationGroup.class})
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     @JsonProperty("eventDate")
     private final LocalDateTime eventDate;

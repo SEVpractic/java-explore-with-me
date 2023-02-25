@@ -17,6 +17,7 @@ import ru.practicum.ewmservice.participation_request.storage.EventRequestRepo;
 import ru.practicum.ewmservice.participation_request.storage.EventRequestStatsRepo;
 import ru.practicum.ewmservice.user.storage.UserRepo;
 import ru.practicum.ewmservice.util.UtilService;
+import ru.practicum.ewmservice.util.exceptions.EventDateValidationException;
 import ru.practicum.ewmservice.util.exceptions.OperationFailedException;
 import ru.practicum.ewmservice.util.mappers.LocationMapper;
 
@@ -119,5 +120,14 @@ public class EventSuperService extends UtilService {
     protected Location findLocationOrSave(Location location) {
         return locationRepo.find(location.getLat(), location.getLon())
                 .orElseGet(() -> locationRepo.save(location));
+    }
+
+    protected void checkEventDate(EventIncomeDto dto, int hours) {
+        if (dto.getEventDate() != null
+                && dto.getEventDate().isBefore(LocalDateTime.now().plusHours(hours))) {
+            throw new EventDateValidationException(
+                    String.format("Время между началом события и текущем моментом не может быть меньше %s часов", hours)
+            );
+        }
     }
 }

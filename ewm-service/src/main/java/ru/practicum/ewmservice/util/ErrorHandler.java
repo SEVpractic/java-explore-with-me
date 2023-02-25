@@ -20,6 +20,7 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 import ru.practicum.ewmservice.util.exceptions.EntityNotExistException;
 import ru.practicum.ewmservice.util.exceptions.OperationFailedException;
+import ru.practicum.ewmservice.util.exceptions.EventDateValidationException;
 
 import javax.validation.ConstraintViolationException;
 import java.time.LocalDateTime;
@@ -32,17 +33,31 @@ public class ErrorHandler extends ResponseEntityExceptionHandler {
                                                                   HttpHeaders headers,
                                                                   HttpStatus status,
                                                                   WebRequest request) {
-        log.info("409 {}", ex.getMessage());
+        log.info("400 {}", ex.getMessage());
         return new ResponseEntity<>(new ExceptionDto(
                 ex.getMessage(),
                 ex.getMessage(),
-                HttpStatus.CONFLICT.name(),
+                HttpStatus.BAD_REQUEST.name(),
                 LocalDateTime.now()
-        ), HttpStatus.CONFLICT);
-    }
+        ), HttpStatus.BAD_REQUEST);
+    }//todo 400 at 20:44 3
 
     @ExceptionHandler
     protected ResponseEntity<Object> handleMethodArgumentTypeMismatchException(MethodArgumentTypeMismatchException ex) {
+        log.info("400 {}", ex.getMessage());
+        return new ResponseEntity<>(new ExceptionDto(
+                ex.getMessage(),
+                ex.getMessage(),
+                HttpStatus.BAD_REQUEST.name(),
+                LocalDateTime.now()
+        ), HttpStatus.BAD_REQUEST);
+    }
+
+    @Override
+    protected ResponseEntity<Object> handleMissingServletRequestParameter(MissingServletRequestParameterException ex,
+                                                                          HttpHeaders headers,
+                                                                          HttpStatus status,
+                                                                          WebRequest request) {
         log.info("400 {}", ex.getMessage());
         return new ResponseEntity<>(new ExceptionDto(
                 ex.getMessage(),
@@ -65,8 +80,6 @@ public class ErrorHandler extends ResponseEntityExceptionHandler {
                 LocalDateTime.now()
         ), HttpStatus.BAD_REQUEST);
     }
-
-
 
     @ExceptionHandler
     private ResponseEntity<Object> handleThrowableException(Throwable ex) {
@@ -136,6 +149,17 @@ public class ErrorHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler
     private ResponseEntity<Object> handleOperationFailedException(OperationFailedException ex) {
+        log.info("409 {}", ex.getMessage());
+        return new ResponseEntity<>(new ExceptionDto(
+                ex.getMessage(),
+                ex.getMessage(),
+                HttpStatus.CONFLICT.name(),
+                LocalDateTime.now()
+        ), HttpStatus.CONFLICT);
+    }
+
+    @ExceptionHandler
+    private ResponseEntity<Object> handleTimeValidationException(EventDateValidationException ex) {
         log.info("409 {}", ex.getMessage());
         return new ResponseEntity<>(new ExceptionDto(
                 ex.getMessage(),

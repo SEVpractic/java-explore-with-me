@@ -17,6 +17,7 @@ import ru.practicum.ewmservice.event.storage.LocationRepo;
 import ru.practicum.ewmservice.participation_request.storage.EventRequestRepo;
 import ru.practicum.ewmservice.participation_request.storage.EventRequestStatsRepo;
 import ru.practicum.ewmservice.user.storage.UserRepo;
+import ru.practicum.ewmservice.util.exceptions.EventDateValidationException;
 import ru.practicum.ewmservice.util.mappers.EventMapper;
 
 import java.time.LocalDateTime;
@@ -43,6 +44,7 @@ public class EventAdminServiceImpl extends EventSuperService implements EventAdm
     @Override
     @Transactional
     public EventFullDto update(EventIncomeDto dto, long eventId) {
+        checkEventDate(dto, 1);
         Event event = findEventOrThrow(eventId);
 
         event = update(event, dto);
