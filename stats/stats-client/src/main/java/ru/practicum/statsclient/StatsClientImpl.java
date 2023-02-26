@@ -4,6 +4,8 @@ import kong.unirest.GenericType;
 import kong.unirest.Unirest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import ru.practicum.statsdto.HitDto;
 import ru.practicum.statsdto.Stat;
@@ -15,15 +17,14 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Service
-@RequiredArgsConstructor
 @Slf4j
 public class StatsClientImpl implements StatsClient {
     private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-    private static final String URI = "http://localhost:9090";
+    private final String uri = "http://stats-server:9090";
 
     @Override
     public void saveHit(HitDto dto) {
-        Unirest.post(URI + "/hit")
+        Unirest.post(uri + "/hit")
                 .body(dto)
                 .contentType("application/json")
                 .asEmpty();
@@ -32,7 +33,7 @@ public class StatsClientImpl implements StatsClient {
 
     @Override
     public void saveHit(List<HitDto> dtos) {
-        Unirest.post(URI + "/hit")
+        Unirest.post(uri + "/hit")
                 .body(dtos)
                 .contentType("application/json")
                 .asEmpty();
@@ -50,7 +51,7 @@ public class StatsClientImpl implements StatsClient {
     }
 
     private List<Stat> get(String start, String end, List<String> uris, boolean unique) {
-        return Unirest.get(URI + "/stats")
+        return Unirest.get(uri + "/stats")
                 .queryString("start", start)
                 .queryString("end", end)
                 .queryString("uris", uris)
