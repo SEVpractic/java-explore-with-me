@@ -117,7 +117,11 @@ public class UtilService {
     }
 
     protected void saveStat(long eventId, String ip) {
-        HitDto dto = HitDtoMapper.fillHit(eventId, ip);
-        statsClient.saveHit(dto);
+        try {
+            HitDto dto = HitDtoMapper.fillHit(eventId, ip);
+            statsClient.saveHit(dto);
+        } catch (RuntimeException ex){
+            log.info(ex.getMessage());
+        }
     }
 }
