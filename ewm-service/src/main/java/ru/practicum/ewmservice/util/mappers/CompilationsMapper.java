@@ -32,7 +32,7 @@ public class CompilationsMapper {
 
     public static List<CompilationDto> toCompilationDto(List<Compilation> compilations) {
         return compilations.stream()
-                .map(c -> CompilationsMapper.toCompilationDto(c))
+                .map(CompilationsMapper::toCompilationDto)
                 .collect(Collectors.toList());
     }
 }

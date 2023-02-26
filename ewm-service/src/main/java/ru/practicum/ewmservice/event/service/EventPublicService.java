@@ -15,7 +15,8 @@ public interface EventPublicService {
                                LocalDateTime rangeEnd,
                                boolean onlyAvailable,
                                EventSorts sort,
-                               int from, int size);
+                               int from, int size,
+                               String ip);
 
-    EventFullDto getById(long eventId);
+    EventFullDto getById(long eventId, String ip);
 }

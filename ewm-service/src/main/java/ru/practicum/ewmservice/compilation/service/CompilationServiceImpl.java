@@ -18,6 +18,7 @@ import ru.practicum.ewmservice.participation_request.storage.EventRequestStatsRe
 import ru.practicum.ewmservice.user.storage.UserRepo;
 import ru.practicum.ewmservice.util.UtilService;
 import ru.practicum.ewmservice.util.mappers.CompilationsMapper;
+import ru.practicum.statsclient.StatsClientImpl;
 
 import java.util.List;
 import java.util.Set;
@@ -26,7 +27,6 @@ import java.util.Set;
 @Slf4j
 @Transactional
 public class CompilationServiceImpl extends UtilService implements CompilationService{
-
     public CompilationServiceImpl(UserRepo userRepo,
                                   EventRepo eventRepo,
                                   CategoryRepo categoryRepo,
@@ -34,9 +34,10 @@ public class CompilationServiceImpl extends UtilService implements CompilationSe
                                   EventStateRepo eventStateRepo,
                                   CompilationRepo compilationRepo,
                                   EventRequestRepo eventRequestRepo,
-                                  EventRequestStatsRepo eventRequestStatsRepo) {
+                                  EventRequestStatsRepo eventRequestStatsRepo,
+                                  StatsClientImpl statsClient) {
         super(userRepo, eventRepo, categoryRepo, locationRepo, eventStateRepo,
-                compilationRepo, eventRequestRepo, eventRequestStatsRepo);
+                compilationRepo, eventRequestRepo, eventRequestStatsRepo, statsClient);
     }
 
     @Override

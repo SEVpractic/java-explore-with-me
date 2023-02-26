@@ -17,8 +17,8 @@ import ru.practicum.ewmservice.event.storage.LocationRepo;
 import ru.practicum.ewmservice.participation_request.storage.EventRequestRepo;
 import ru.practicum.ewmservice.participation_request.storage.EventRequestStatsRepo;
 import ru.practicum.ewmservice.user.storage.UserRepo;
-import ru.practicum.ewmservice.util.exceptions.EventDateValidationException;
 import ru.practicum.ewmservice.util.mappers.EventMapper;
+import ru.practicum.statsclient.StatsClientImpl;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -28,7 +28,6 @@ import java.util.stream.Collectors;
 @Slf4j
 @Transactional(readOnly = true)
 public class EventAdminServiceImpl extends EventSuperService implements EventAdminService {
-
     public EventAdminServiceImpl(UserRepo userRepo,
                                  EventRepo eventRepo,
                                  CategoryRepo categoryRepo,
@@ -36,9 +35,10 @@ public class EventAdminServiceImpl extends EventSuperService implements EventAdm
                                  EventStateRepo eventStateRepo,
                                  CompilationRepo compilationRepo,
                                  EventRequestRepo eventRequestRepo,
-                                 EventRequestStatsRepo eventRequestStatsRepo) {
-        super(userRepo, eventRepo, categoryRepo, locationRepo, eventStateRepo, compilationRepo,
-                eventRequestRepo, eventRequestStatsRepo);
+                                 EventRequestStatsRepo eventRequestStatsRepo,
+                                 StatsClientImpl statsClient) {
+        super(userRepo, eventRepo, categoryRepo, locationRepo, eventStateRepo,
+                compilationRepo, eventRequestRepo, eventRequestStatsRepo, statsClient);
     }
 
     @Override

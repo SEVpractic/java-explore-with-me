@@ -19,6 +19,7 @@ import ru.practicum.ewmservice.user.storage.UserRepo;
 import ru.practicum.ewmservice.util.UtilService;
 import ru.practicum.ewmservice.util.exceptions.OperationFailedException;
 import ru.practicum.ewmservice.util.mappers.CategoryMapper;
+import ru.practicum.statsclient.StatsClientImpl;
 
 import java.util.List;
 
@@ -26,7 +27,6 @@ import java.util.List;
 @Slf4j
 @Transactional
 public class CategoryServiceImpl extends UtilService implements CategoryService{
-
     public CategoryServiceImpl(UserRepo userRepo,
                                EventRepo eventRepo,
                                CategoryRepo categoryRepo,
@@ -34,9 +34,10 @@ public class CategoryServiceImpl extends UtilService implements CategoryService{
                                EventStateRepo eventStateRepo,
                                CompilationRepo compilationRepo,
                                EventRequestRepo eventRequestRepo,
-                               EventRequestStatsRepo eventRequestStatsRepo) {
+                               EventRequestStatsRepo eventRequestStatsRepo,
+                               StatsClientImpl statsClient) {
         super(userRepo, eventRepo, categoryRepo, locationRepo, eventStateRepo,
-                compilationRepo, eventRequestRepo, eventRequestStatsRepo);
+                compilationRepo, eventRequestRepo, eventRequestStatsRepo, statsClient);
     }
 
     @Override
@@ -90,7 +91,7 @@ public class CategoryServiceImpl extends UtilService implements CategoryService{
     }
 
     private void checkDeleteAvailable(Category category) {
-        if (eventRepo.findAllByCategory(category).size() != 0) {
+        if (!eventRepo.findAllByCategory(category).isEmpty()) {
             throw new OperationFailedException(
                     String.format("Невозможно удалить категорию id = %s. Существуют события, связанные с категорией",
                             category.getId())

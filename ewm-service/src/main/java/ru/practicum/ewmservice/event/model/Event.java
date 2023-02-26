@@ -25,7 +25,7 @@ public class Event {
     @JoinColumn(name = "category_id")
     private Category category;
     @Column(name = "confirmed_requests") // Количество одобренных заявок на участие
-    private int confirmedRequests; // todo переделать в мени ту ван
+    private int confirmedRequests;
     @Column(name = "created_on")
     private LocalDateTime createdOn; // Дата и время создания события (в формате "yyyy-MM-dd HH:mm:ss")
     @Column(name = "description")

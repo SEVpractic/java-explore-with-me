@@ -28,13 +28,11 @@ public class StatsServiceImpl implements StatsService {
     private final StatsRepo statsRepo;
 
     @Override
-    public HitOutputDto saveRequest(HitDto dto) {
+    public void saveRequest(HitDto dto) {
         App app = getOrCreate(dto);
 
-        Hit hit = statsRepo.save(HitMapper.toHit(dto, app));
+        statsRepo.save(HitMapper.toHit(dto, app));
         log.info("сохранен запрос ip = {} по url = {}", dto.getIp(), dto.getUri());
-
-        return HitMapper.toOutputDto(hit);
     }
 
     @Override

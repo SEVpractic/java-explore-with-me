@@ -19,6 +19,7 @@ import ru.practicum.ewmservice.user.model.User;
 import ru.practicum.ewmservice.user.storage.UserRepo;
 import ru.practicum.ewmservice.util.UtilService;
 import ru.practicum.ewmservice.util.mappers.UserMapper;
+import ru.practicum.statsclient.StatsClientImpl;
 
 import java.util.List;
 
@@ -33,9 +34,10 @@ public class UserServiceImpl extends UtilService implements UserService{
                            EventStateRepo eventStateRepo,
                            CompilationRepo compilationRepo,
                            EventRequestRepo eventRequestRepo,
-                           EventRequestStatsRepo eventRequestStatsRepo) {
+                           EventRequestStatsRepo eventRequestStatsRepo,
+                           StatsClientImpl statsClient) {
         super(userRepo, eventRepo, categoryRepo, locationRepo, eventStateRepo,
-                compilationRepo, eventRequestRepo, eventRequestStatsRepo);
+                compilationRepo, eventRequestRepo, eventRequestStatsRepo, statsClient);
     }
 
     @Override

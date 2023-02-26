@@ -1,6 +1,5 @@
 package ru.practicum.ewmservice.event.storage;
 
-import antlr.collections.impl.ASTArray;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

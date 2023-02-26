@@ -24,8 +24,8 @@ public class StatsController {
 
     @PostMapping("/hit")
     @ResponseStatus(value = HttpStatus.CREATED)
-    public HitOutputDto save(@Valid @RequestBody HitDto dto) {
-        return statsService.saveRequest(dto);
+    public void save(@Valid @RequestBody HitDto dto) {
+        statsService.saveRequest(dto);
     }
 
     @GetMapping("/stats")

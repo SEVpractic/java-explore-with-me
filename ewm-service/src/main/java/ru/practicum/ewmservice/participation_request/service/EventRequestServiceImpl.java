@@ -19,6 +19,7 @@ import ru.practicum.ewmservice.user.storage.UserRepo;
 import ru.practicum.ewmservice.util.exceptions.OperationFailedException;
 import ru.practicum.ewmservice.util.mappers.EventRequestMapper;
 import ru.practicum.ewmservice.util.UtilService;
+import ru.practicum.statsclient.StatsClientImpl;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -27,7 +28,6 @@ import java.util.List;
 @Slf4j
 @Transactional(readOnly = true)
 public class EventRequestServiceImpl extends UtilService implements EventRequestService {
-
     public EventRequestServiceImpl(UserRepo userRepo,
                                    EventRepo eventRepo,
                                    CategoryRepo categoryRepo,
@@ -35,9 +35,10 @@ public class EventRequestServiceImpl extends UtilService implements EventRequest
                                    EventStateRepo eventStateRepo,
                                    CompilationRepo compilationRepo,
                                    EventRequestRepo eventRequestRepo,
-                                   EventRequestStatsRepo eventRequestStatsRepo) {
+                                   EventRequestStatsRepo eventRequestStatsRepo,
+                                   StatsClientImpl statsClient) {
         super(userRepo, eventRepo, categoryRepo, locationRepo, eventStateRepo,
-                compilationRepo, eventRequestRepo, eventRequestStatsRepo);
+                compilationRepo, eventRequestRepo, eventRequestStatsRepo, statsClient);
     }
 
     @Override

@@ -40,7 +40,7 @@ public class ErrorHandler extends ResponseEntityExceptionHandler {
                 HttpStatus.BAD_REQUEST.name(),
                 LocalDateTime.now()
         ), HttpStatus.BAD_REQUEST);
-    }//todo 400 at 20:44 3
+    }
 
     @ExceptionHandler
     protected ResponseEntity<Object> handleMethodArgumentTypeMismatchException(MethodArgumentTypeMismatchException ex) {

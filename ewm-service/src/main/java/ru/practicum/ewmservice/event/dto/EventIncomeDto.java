@@ -6,11 +6,12 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Getter;
 import ru.practicum.ewmservice.util.validation.CreateValidationGroup;
-import ru.practicum.ewmservice.util.validation.EventDateCreateValidation;
-import ru.practicum.ewmservice.util.validation.EventDateUpdateValidation;
 import ru.practicum.ewmservice.util.validation.UpdateValidationGroup;
 
-import javax.validation.constraints.*;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 import java.time.LocalDateTime;
 
 @Builder(toBuilder = true)

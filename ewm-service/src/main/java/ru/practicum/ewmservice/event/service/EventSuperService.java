@@ -20,6 +20,7 @@ import ru.practicum.ewmservice.util.UtilService;
 import ru.practicum.ewmservice.util.exceptions.EventDateValidationException;
 import ru.practicum.ewmservice.util.exceptions.OperationFailedException;
 import ru.practicum.ewmservice.util.mappers.LocationMapper;
+import ru.practicum.statsclient.StatsClientImpl;
 
 import java.time.LocalDateTime;
 
@@ -32,9 +33,10 @@ public class EventSuperService extends UtilService {
                              EventStateRepo eventStateRepo,
                              CompilationRepo compilationRepo,
                              EventRequestRepo eventRequestRepo,
-                             EventRequestStatsRepo eventRequestStatsRepo) {
+                             EventRequestStatsRepo eventRequestStatsRepo,
+                             StatsClientImpl statsClient) {
         super(userRepo, eventRepo, categoryRepo, locationRepo, eventStateRepo,
-                compilationRepo, eventRequestRepo, eventRequestStatsRepo);
+                compilationRepo, eventRequestRepo, eventRequestStatsRepo, statsClient);
     }
 
     protected Event update(Event event, EventIncomeDto dto) {

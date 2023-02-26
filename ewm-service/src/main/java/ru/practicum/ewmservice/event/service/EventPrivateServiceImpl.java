@@ -26,6 +26,7 @@ import ru.practicum.ewmservice.util.mappers.EventMapper;
 import ru.practicum.ewmservice.util.mappers.EventRequestMapper;
 import ru.practicum.ewmservice.util.mappers.LocationMapper;
 import ru.practicum.ewmservice.util.mappers.ProcessRequestResulMapper;
+import ru.practicum.statsclient.StatsClientImpl;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -35,7 +36,6 @@ import java.util.stream.Collectors;
 @Slf4j
 @Transactional(readOnly = true)
 public class EventPrivateServiceImpl extends EventSuperService implements EventPrivateService {
-
     public EventPrivateServiceImpl(UserRepo userRepo,
                                    EventRepo eventRepo,
                                    CategoryRepo categoryRepo,
@@ -43,9 +43,10 @@ public class EventPrivateServiceImpl extends EventSuperService implements EventP
                                    EventStateRepo eventStateRepo,
                                    CompilationRepo compilationRepo,
                                    EventRequestRepo eventRequestRepo,
-                                   EventRequestStatsRepo eventRequestStatsRepo) {
+                                   EventRequestStatsRepo eventRequestStatsRepo,
+                                   StatsClientImpl statsClient) {
         super(userRepo, eventRepo, categoryRepo, locationRepo, eventStateRepo,
-                compilationRepo, eventRequestRepo, eventRequestStatsRepo);
+                compilationRepo, eventRequestRepo, eventRequestStatsRepo, statsClient);
     }
 
     @Override
@@ -136,10 +137,6 @@ public class EventPrivateServiceImpl extends EventSuperService implements EventP
         }
 
         return ProcessRequestResulMapper.toDto(requests);
-        //todo если для события лимит заявок равен 0 или отключена пре-модерация заявок, то подтверждение заявок не требуется
-        //todo нельзя подтвердить заявку, если уже достигнут лимит по заявкам на данное событие (Ожидается код ошибки 409)
-        //todo статус можно изменить только у заявок, находящихся в состоянии ожидания (Ожидается код ошибки 409)
-        //todo если при подтверждении данной заявки, лимит заявок для события исчерпан, то все неподтверждённые заявки необходимо отклонить
     }
 
     private void filterAndProcessRequests(List<EventRequest> requests, Event event) {

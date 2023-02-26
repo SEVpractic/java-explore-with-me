@@ -54,7 +54,7 @@ public class EventMapper {
 
     public static List<EventFullDto> toEventFullDto(List<Event> events) {
         return events.stream()
-                .map(event -> toEventFullDto(event))
+                .map(EventMapper::toEventFullDto)
                 .collect(Collectors.toList());
     }
 

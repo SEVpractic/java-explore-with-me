@@ -17,13 +17,14 @@ import ru.practicum.ewmservice.participation_request.storage.EventRequestRepo;
 import ru.practicum.ewmservice.participation_request.storage.EventRequestStatsRepo;
 import ru.practicum.ewmservice.user.storage.UserRepo;
 import ru.practicum.ewmservice.util.mappers.EventMapper;
+import ru.practicum.statsclient.StatsClientImpl;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
 @Slf4j
-@Transactional(readOnly = true)
+@Transactional
 public class EventPublicServiceImpl extends EventSuperService implements EventPublicService {
     public EventPublicServiceImpl(UserRepo userRepo,
                                   EventRepo eventRepo,
@@ -32,9 +33,10 @@ public class EventPublicServiceImpl extends EventSuperService implements EventPu
                                   EventStateRepo eventStateRepo,
                                   CompilationRepo compilationRepo,
                                   EventRequestRepo eventRequestRepo,
-                                  EventRequestStatsRepo eventRequestStatsRepo) {
+                                  EventRequestStatsRepo eventRequestStatsRepo,
+                                  StatsClientImpl statsClient) {
         super(userRepo, eventRepo, categoryRepo, locationRepo, eventStateRepo,
-                compilationRepo, eventRequestRepo, eventRequestStatsRepo);
+                compilationRepo, eventRequestRepo, eventRequestStatsRepo, statsClient);
     }
 
     @Override
@@ -43,24 +45,29 @@ public class EventPublicServiceImpl extends EventSuperService implements EventPu
                                       LocalDateTime rangeEnd,
                                       boolean onlyAvailable,
                                       EventSorts sort,
-                                      int from, int size) {
+                                      int from, int size,
+                                      String ip) {
         List<Event> events;
 
         Pageable pageable = createPageableBySort(sort, from, size);
         events = findByText(text, categories, paid, rangeStart, rangeEnd, onlyAvailable, pageable);
         log.info("Возвращаю коллекцию событий по запросу");
-        //todo информация о каждом событии должна включать в себя количество просмотров и количество уже одобренных заявок на участие
-        //todo информацию о том, что по этому эндпоинту был осуществлен и обработан запрос, нужно сохранить в сервисе статистики
+
+        saveStat(0, ip);
+        log.info("Сохраняю в сервере статистики");
 
         return EventMapper.toEventShortDto(events);
     }
 
     @Override
-    public EventFullDto getById(long eventId) {
+    public EventFullDto getById(long eventId, String ip) {
         Event event = findPublicEventOrThrow(eventId);
         log.info("Возвращаю событие c id = {} ", eventId);
-        //todo информация о событии должна включать в себя количество просмотров и количество подтвержденных запросов
-        //todo информацию о том, что по этому эндпоинту был осуществлен и обработан запрос, нужно сохранить в сервисе статистики
+
+        saveStat(eventId, ip);
+        event.setViews(event.getViews() + 1);
+        log.info("Сохраняю в сервере статистики");
+
         return EventMapper.toEventFullDto(event);
     }
 

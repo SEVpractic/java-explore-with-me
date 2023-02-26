@@ -26,6 +26,9 @@ import ru.practicum.ewmservice.participation_request.storage.EventRequestStatsRe
 import ru.practicum.ewmservice.user.model.User;
 import ru.practicum.ewmservice.user.storage.UserRepo;
 import ru.practicum.ewmservice.util.exceptions.EntityNotExistException;
+import ru.practicum.ewmservice.util.mappers.HitDtoMapper;
+import ru.practicum.statsclient.StatsClientImpl;
+import ru.practicum.statsdto.HitDto;
 
 @Service
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
@@ -40,6 +43,7 @@ public class UtilService {
     protected final CompilationRepo compilationRepo;
     protected final EventRequestRepo eventRequestRepo;
     protected final EventRequestStatsRepo eventRequestStatsRepo;
+    private final StatsClientImpl statsClient;
 
     protected EventRequestStat findRequestStatOrThrow(EventRequestStats stat) {
         return eventRequestStatsRepo.findByName(stat.name())
@@ -110,5 +114,10 @@ public class UtilService {
                 size,
                 Sort.by(Sort.Direction.ASC, sort)
         );
+    }
+
+    protected void saveStat(long eventId, String ip) {
+        HitDto dto = HitDtoMapper.fillHit(eventId, ip);
+        statsClient.saveHit(dto);
     }
 }
