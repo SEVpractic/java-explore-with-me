@@ -26,7 +26,7 @@ import java.util.List;
 @Service
 @Slf4j
 @Transactional
-public class CategoryServiceImpl extends UtilService implements CategoryService{
+public class CategoryServiceImpl extends UtilService implements CategoryService {
     public CategoryServiceImpl(UserRepo userRepo,
                                EventRepo eventRepo,
                                CategoryRepo categoryRepo,

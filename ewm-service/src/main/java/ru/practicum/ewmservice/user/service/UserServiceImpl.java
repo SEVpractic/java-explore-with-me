@@ -26,7 +26,7 @@ import java.util.List;
 @Service
 @Slf4j
 @Transactional(readOnly = true)
-public class UserServiceImpl extends UtilService implements UserService{
+public class UserServiceImpl extends UtilService implements UserService {
     public UserServiceImpl(UserRepo userRepo,
                            EventRepo eventRepo,
                            CategoryRepo categoryRepo,

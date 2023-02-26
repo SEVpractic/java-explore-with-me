@@ -19,7 +19,7 @@ public class EventRequestMapper {
                 .build();
     }
 
-    public static List<EventRequestDto> toEventRequestDto(List <EventRequest> eventRequest) {
+    public static List<EventRequestDto> toEventRequestDto(List<EventRequest> eventRequest) {
         return eventRequest.stream()
                 .map(EventRequestMapper::toEventRequestDto)
                 .collect(Collectors.toList());

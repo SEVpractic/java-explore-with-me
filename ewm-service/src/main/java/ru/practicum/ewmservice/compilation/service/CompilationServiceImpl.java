@@ -26,7 +26,7 @@ import java.util.Set;
 @Service
 @Slf4j
 @Transactional
-public class CompilationServiceImpl extends UtilService implements CompilationService{
+public class CompilationServiceImpl extends UtilService implements CompilationService {
     public CompilationServiceImpl(UserRepo userRepo,
                                   EventRepo eventRepo,
                                   CategoryRepo categoryRepo,
