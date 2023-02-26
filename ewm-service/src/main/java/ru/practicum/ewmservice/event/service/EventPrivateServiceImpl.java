@@ -30,6 +30,7 @@ import ru.practicum.statsclient.StatsClientImpl;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -182,7 +183,7 @@ public class EventPrivateServiceImpl extends EventSuperService implements EventP
     }
 
     private void checkInitiator(User user, Event event) {
-        if (event.getInitiator().getId() != user.getId()) {
+        if (!Objects.equals(event.getInitiator().getId(), user.getId())) {
             throw new OperationFailedException(
                     "Только создатель имеет право редактировать событие и получать запросы на участие"
             );

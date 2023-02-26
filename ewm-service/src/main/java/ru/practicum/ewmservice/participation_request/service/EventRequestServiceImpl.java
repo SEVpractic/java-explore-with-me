@@ -23,6 +23,7 @@ import ru.practicum.statsclient.StatsClientImpl;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @Slf4j
@@ -98,7 +99,7 @@ public class EventRequestServiceImpl extends UtilService implements EventRequest
     }
 
     private void checkCreateAvailability(User user, Event event) {
-        if (event.getInitiator().getId() == user.getId()) {
+        if (Objects.equals(event.getInitiator().getId(), user.getId())) {
             throw new OperationFailedException(
                     "инициатор события не может добавить запрос на участие в своём событии"
             );
@@ -121,7 +122,7 @@ public class EventRequestServiceImpl extends UtilService implements EventRequest
     }
 
     private void checkCancelAvailability(User user, EventRequest request) {
-        if (request.getRequester().getId() != user.getId()) {
+        if (!Objects.equals(request.getRequester().getId(), user.getId())) {
             throw new OperationFailedException(
                     "только инициатор запроса может отменить свой запрос"
             );
