@@ -120,7 +120,7 @@ public class UtilService {
         try {
             HitDto dto = HitDtoMapper.fillHit(eventId, ip);
             statsClient.saveHit(dto);
-        } catch (RuntimeException ex){
+        } catch (RuntimeException ex) {
             log.info(ex.getMessage());
         }
     }
