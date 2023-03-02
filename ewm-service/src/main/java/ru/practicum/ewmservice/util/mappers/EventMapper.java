@@ -7,9 +7,12 @@ import ru.practicum.ewmservice.event.dto.EventIncomeDto;
 import ru.practicum.ewmservice.event.dto.EventShortDto;
 import ru.practicum.ewmservice.event.model.Event;
 import ru.practicum.ewmservice.event.model.Location;
+import ru.practicum.ewmservice.participation_request.model.EventRequest;
 import ru.practicum.ewmservice.user.model.User;
+import ru.practicum.statsdto.Stat;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @UtilityClass
@@ -31,12 +34,14 @@ public class EventMapper {
         return event;
     }
 
-    public static EventFullDto toEventFullDto(Event event) {
+    public static EventFullDto toEventFullDto(Event event,
+                                              List<EventRequest> confirmedRequests,
+                                              Map<Long, List<Stat>> views) {
         return EventFullDto.builder()
                 .id(event.getId())
                 .annotation(event.getAnnotation())
                 .category(CategoryMapper.toCategoryDto(event.getCategory()))
-                .confirmedRequests(event.getConfirmedRequests())
+                .confirmedRequests(confirmedRequests.size())
                 .createdOn(event.getCreatedOn())
                 .description(event.getDescription())
                 .eventDate(event.getEventDate())
@@ -48,33 +53,55 @@ public class EventMapper {
                 .requestModeration(event.getRequestModeration())
                 .state(event.getState().getName())
                 .title(event.getTitle())
-                .views(event.getViews())
+                .views(getViews(event.getId(), views))
                 .build();
     }
 
-    public static List<EventFullDto> toEventFullDto(List<Event> events) {
+    public static List<EventFullDto> toEventFullDto(List<Event> events,
+                                                    Map<Event, List<EventRequest>> confirmedRequests,
+                                                    Map<Long, List<Stat>> views) {
         return events.stream()
-                .map(EventMapper::toEventFullDto)
+                .map(event -> toEventFullDto(
+                        event,
+                        confirmedRequests.getOrDefault(event, List.of()),
+                        views
+                ))
                 .collect(Collectors.toList());
     }
 
-    public static EventShortDto toEventShortDto(Event event) {
+    public static EventShortDto toEventShortDto(Event event,
+                                                List<EventRequest> confirmedRequests,
+                                                Map<Long, List<Stat>> views) {
         return EventShortDto.builder()
                 .id(event.getId())
                 .annotation(event.getAnnotation())
                 .category(CategoryMapper.toCategoryDto(event.getCategory()))
-                .confirmedRequests(event.getConfirmedRequests())
+                .confirmedRequests(confirmedRequests.size())
                 .eventDate(event.getEventDate())
                 .initiator(UserMapper.toUserDto(event.getInitiator()))
                 .paid(event.getPaid())
                 .title(event.getTitle())
-                .views(event.getViews())
+                .views(getViews(event.getId(), views))
                 .build();
     }
 
-    public static List<EventShortDto> toEventShortDto(List<Event> events) {
+    public static List<EventShortDto> toEventShortDto(List<Event> events,
+                                                      Map<Event, List<EventRequest>> confirmedRequests,
+                                                      Map<Long, List<Stat>> views) {
         return events.stream()
-                .map(EventMapper::toEventShortDto)
+                .map(event -> toEventShortDto(
+                        event,
+                        confirmedRequests.getOrDefault(event, List.of()),
+                        views
+                ))
                 .collect(Collectors.toList());
+    }
+
+    private static int getViews(Long eventId, Map<Long, List<Stat>> views) {
+        if (views != null && views.get(eventId) != null && views.get(eventId).get(0) != null) {
+            return views.get(eventId).get(0).getHits();
+        } else {
+            return  0;
+        }
     }
 }

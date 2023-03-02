@@ -24,8 +24,6 @@ public class Event {
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "category_id")
     private Category category;
-    @Column(name = "confirmed_requests") // Количество одобренных заявок на участие
-    private int confirmedRequests;
     @Column(name = "created_on")
     private LocalDateTime createdOn; // Дата и время создания события (в формате "yyyy-MM-dd HH:mm:ss")
     @Column(name = "description")
@@ -51,8 +49,6 @@ public class Event {
     private EventState state;// Список состояний жизненного цикла события
     @Column(name = "title")
     private String title; // Заголовок
-    @Column(name = "views")
-    private int views;
     @ManyToMany(mappedBy = "events")
     private Set<Compilation> compilations; // Подборки
 }

@@ -12,7 +12,6 @@ import java.util.List;
 @Builder(toBuilder = true)
 @Getter
 public class CompilationIncomeDto {
-    @NotNull(groups = CreateValidationGroup.class)
     @JsonProperty("events")
     private final List<Long> eventIds;
     @NotNull(groups = CreateValidationGroup.class)

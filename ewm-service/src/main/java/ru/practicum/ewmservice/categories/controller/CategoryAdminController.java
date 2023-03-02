@@ -3,7 +3,6 @@ package ru.practicum.ewmservice.categories.controller;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.ewmservice.categories.dto.CategoryDto;
 import ru.practicum.ewmservice.categories.service.CategoryService;
@@ -13,7 +12,6 @@ import javax.validation.Valid;
 @RestController
 @RequestMapping(path = "/admin/categories")
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
-@Validated
 public class CategoryAdminController {
     private final CategoryService categoryService;
 

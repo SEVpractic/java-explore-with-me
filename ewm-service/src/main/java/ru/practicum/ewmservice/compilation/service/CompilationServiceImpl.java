@@ -1,105 +1,145 @@
 package ru.practicum.ewmservice.compilation.service;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.practicum.ewmservice.categories.storage.CategoryRepo;
 import ru.practicum.ewmservice.compilation.dto.CompilationDto;
 import ru.practicum.ewmservice.compilation.dto.CompilationIncomeDto;
 import ru.practicum.ewmservice.compilation.model.Compilation;
 import ru.practicum.ewmservice.compilation.storage.CompilationRepo;
 import ru.practicum.ewmservice.event.model.Event;
 import ru.practicum.ewmservice.event.storage.EventRepo;
-import ru.practicum.ewmservice.event.storage.EventStateRepo;
-import ru.practicum.ewmservice.event.storage.LocationRepo;
-import ru.practicum.ewmservice.participation_request.storage.EventRequestRepo;
-import ru.practicum.ewmservice.participation_request.storage.EventRequestStatsRepo;
-import ru.practicum.ewmservice.user.storage.UserRepo;
+import ru.practicum.ewmservice.participation_request.model.EventRequest;
 import ru.practicum.ewmservice.util.UtilService;
 import ru.practicum.ewmservice.util.mappers.CompilationsMapper;
-import ru.practicum.statsclient.StatsClientImpl;
+import ru.practicum.statsdto.Stat;
 
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Service
 @Slf4j
-@Transactional
-public class CompilationServiceImpl extends UtilService implements CompilationService {
-    public CompilationServiceImpl(UserRepo userRepo,
-                                  EventRepo eventRepo,
-                                  CategoryRepo categoryRepo,
-                                  LocationRepo locationRepo,
-                                  EventStateRepo eventStateRepo,
-                                  CompilationRepo compilationRepo,
-                                  EventRequestRepo eventRequestRepo,
-                                  EventRequestStatsRepo eventRequestStatsRepo,
-                                  StatsClientImpl statsClient) {
-        super(userRepo, eventRepo, categoryRepo, locationRepo, eventStateRepo,
-                compilationRepo, eventRequestRepo, eventRequestStatsRepo, statsClient);
-    }
+@Transactional(readOnly = true)
+@RequiredArgsConstructor(onConstructor_ = @Autowired)
+public class CompilationServiceImpl implements CompilationService {
+    private final EventRepo eventRepo;
+    private final UtilService utilService;
+    private final CompilationRepo compilationRepo;
 
     @Override
+    @Transactional
     public CompilationDto create(CompilationIncomeDto dto) {
+        Map<Long, List<Stat>> views;
+        Map<Event, List<EventRequest>> confirmedRequests;
         Compilation compilation = CompilationsMapper.toCompilation(dto);
         compilation.setEvents(findEvensByIds(dto.getEventIds()));
 
         compilation = compilationRepo.save(compilation);
+        confirmedRequests = utilService.findConfirmedRequests(
+                new ArrayList<>(compilation.getEvents())
+        );
+        views = getViews(compilation);
         log.info("Создана подборка c id = {} ", compilation.getId());
 
-        return CompilationsMapper.toCompilationDto(compilation);
+        return CompilationsMapper.toCompilationDto(compilation, confirmedRequests, views);
     }
 
     @Override
+    @Transactional
     public CompilationDto update(CompilationIncomeDto dto, long compId) {
-        Compilation compilation = findCompilationOrThrow(compId);
+        Map<Long, List<Stat>> views;
+        Map<Event, List<EventRequest>> confirmedRequests;
+        Compilation compilation = utilService.findCompilationOrThrow(compId);
 
         if (dto.getPinned() != null) compilation.setPinned(dto.getPinned());
-        if (dto.getTitle() != null) compilation.setTitle(dto.getTitle());
-        if (!dto.getEventIds().isEmpty()) {
+        if (dto.getTitle() != null && !dto.getTitle().isBlank()) compilation.setTitle(dto.getTitle());
+        if (dto.getEventIds() != null && !dto.getEventIds().isEmpty()) {
             compilation.setEvents(findEvensByIds(dto.getEventIds()));
         }
 
-        return CompilationsMapper.toCompilationDto(compilation);
+        confirmedRequests = utilService.findConfirmedRequests(
+                new ArrayList<>(compilation.getEvents())
+        );
+        views = getViews(compilation);
+        log.info("Обновлена подборка c id = {} ", compilation.getId());
+
+        return CompilationsMapper.toCompilationDto(compilation, confirmedRequests, views);
     }
 
     @Override
+    @Transactional
     public CompilationDto delete(long compId) {
-        Compilation compilation = findCompilationOrThrow(compId);
+        Map<Long, List<Stat>> views;
+        Map<Event, List<EventRequest>> confirmedRequests;
+        Compilation compilation = utilService.findCompilationOrThrow(compId);
 
         compilationRepo.delete(compilation);
+        confirmedRequests = utilService.findConfirmedRequests(
+                new ArrayList<>(compilation.getEvents())
+        );
+        views = getViews(compilation);
         log.info("Удалена подборка c id = {} ", compilation.getId());
 
-        return CompilationsMapper.toCompilationDto(compilation);
+        return CompilationsMapper.toCompilationDto(compilation, confirmedRequests, views);
     }
 
     @Override
-    @Transactional(readOnly = true)
-    public List<CompilationDto> getAll(boolean pinned, int from, int size) {
+    public List<CompilationDto> getAll(Boolean pinned, int from, int size) {
+        Set<Event> events = new HashSet<>();
+        Map<Long, List<Stat>> views;
+        Map<Event, List<EventRequest>> confirmedRequests;
         List<Compilation> compilations;
-        Pageable pageable = createPageable("id", from, size);
+        Pageable pageable = utilService.createPageable("id", from, size);
 
-        compilations = findByPinned(pinned, pageable);
-        log.info("Возвращаю коллекцию подборок событий по запросу");
+        if (pinned != null) {
+            compilations = findAllByPinned(pinned, pageable);
+            log.info("Возвращаю коллекцию подборок событий по запросу");
+        } else {
+            compilations = findAll(pageable);
+            log.info("Возвращаю коллекцию подборок событий по запросу");
+        }
 
-        return CompilationsMapper.toCompilationDto(compilations);
+        compilations.forEach(compilation -> events.addAll(compilation.getEvents()));
+        confirmedRequests = utilService.findConfirmedRequestsByCompilations(compilations);
+        views = utilService.findViews(events);
+
+        return CompilationsMapper.toCompilationDto(compilations, confirmedRequests, views);
     }
 
     @Override
-    @Transactional(readOnly = true)
     public CompilationDto getById(long compId) {
-        Compilation compilation = findCompilationOrThrow(compId);
+        Map<Long, List<Stat>> views;
+        Map<Event, List<EventRequest>> confirmedRequests;
+
+        Compilation compilation = utilService.findCompilationOrThrow(compId);
+        confirmedRequests = utilService.findConfirmedRequests(
+                new ArrayList<>(compilation.getEvents())
+        );
+        views = getViews(compilation);
         log.info("Возвращаю подборку c id = {} ", compilation.getId());
 
-        return CompilationsMapper.toCompilationDto(compilation);
+        return CompilationsMapper.toCompilationDto(compilation, confirmedRequests, views);
     }
 
-    private List<Compilation> findByPinned(boolean pinned, Pageable pageable) {
-        return compilationRepo.findAllByPinned(pinned, pageable);
+    private List<Compilation> findAllByPinned(boolean pinned, Pageable pageable) {
+        return compilationRepo.findAllByPinned(pinned, pageable).toList();
+    }
+
+    private List<Compilation> findAll(Pageable pageable) {
+        return compilationRepo.findAll(pageable).toList();
     }
 
     private Set<Event> findEvensByIds(List<Long> ids) {
         return eventRepo.findByIdIn(ids);
+    }
+
+    private Map<Long, List<Stat>> getViews(Compilation compilation) {
+        if (compilation.getEvents() != null && !compilation.getEvents().isEmpty()) {
+            return utilService.findViews(compilation);
+        } else {
+            return Map.of();
+        }
     }
 }

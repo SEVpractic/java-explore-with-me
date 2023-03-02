@@ -12,6 +12,7 @@ import ru.practicum.ewmservice.util.validation.CreateValidationGroup;
 import ru.practicum.ewmservice.util.validation.UpdateValidationGroup;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Positive;
 import java.util.List;
 
 @RestController
@@ -24,37 +25,37 @@ public class EventPrivateController {
     @PostMapping
     @ResponseStatus(value = HttpStatus.CREATED)
     public EventFullDto create(@Validated(CreateValidationGroup.class) @RequestBody EventIncomeDto dto,
-                               @PathVariable("userId") long userId) {
+                               @PathVariable("userId") @Positive long userId) {
         return eventService.create(dto, userId);
     }
 
     @PatchMapping(path = "/{eventId}")
     public EventFullDto update(@Validated(UpdateValidationGroup.class) @RequestBody EventIncomeDto dto,
-                               @PathVariable("userId") long userId,
-                               @PathVariable("eventId") long eventId) {
+                               @PathVariable("userId") @Positive long userId,
+                               @PathVariable("eventId") @Positive long eventId) {
         return eventService.update(dto, userId, eventId);
     }
 
     @GetMapping
-    public List<EventShortDto> getAll(@PathVariable("userId") long userId) {
+    public List<EventShortDto> getAll(@PathVariable("userId") @Positive long userId) {
         return eventService.getAll(userId);
     }
 
     @GetMapping(path = "/{eventId}")
-    public EventFullDto getBuId(@PathVariable("userId") long userId,
-                                @PathVariable("eventId") long eventId) {
+    public EventFullDto getBuId(@PathVariable("userId") @Positive long userId,
+                                @PathVariable("eventId") @Positive long eventId) {
         return eventService.getById(userId, eventId);
     }
 
     @GetMapping("/{eventId}/requests")
-    public List<EventRequestDto> getRequests(@PathVariable("userId") long userId,
-                                             @PathVariable("eventId") long eventId) {
+    public List<EventRequestDto> getRequests(@PathVariable("userId") @Positive long userId,
+                                             @PathVariable("eventId") @Positive long eventId) {
         return eventService.getRequests(userId, eventId);
     }
 
     @PatchMapping("{eventId}/requests")
-    public ProcessRequestResultDto processRequests(@PathVariable("userId") long userId,
-                                                   @PathVariable("eventId") long eventId,
+    public ProcessRequestResultDto processRequests(@PathVariable("userId") @Positive long userId,
+                                                   @PathVariable("eventId") @Positive long eventId,
                                                    @Valid @RequestBody ProcessRequestsDto dto) {
         return eventService.processRequests(userId, eventId, dto);
     }

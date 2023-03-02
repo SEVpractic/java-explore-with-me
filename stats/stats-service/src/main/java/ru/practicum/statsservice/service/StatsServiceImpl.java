@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.statsdto.HitDto;
+import ru.practicum.statsdto.HitsDto;
 import ru.practicum.statsdto.Stat;
 import ru.practicum.statsservice.model.App;
 import ru.practicum.statsservice.storage.AppRepo;
@@ -15,7 +16,7 @@ import ru.practicum.statsservice.util.HitMapper;
 import ru.practicum.statsservice.util.exception.InvalidPeriodException;
 
 import java.time.LocalDateTime;
-import java.util.List;
+import java.util.*;
 
 @Service
 @Slf4j
@@ -27,10 +28,18 @@ public class StatsServiceImpl implements StatsService {
 
     @Override
     public void saveRequest(HitDto dto) {
-        App app = getOrCreate(dto);
+        App app = getOrCreate(dto.getApp());
 
         statsRepo.save(HitMapper.toHit(dto, app));
         log.info("сохранен запрос ip = {} по url = {}", dto.getIp(), dto.getUri());
+    }
+
+    @Override
+    public void saveRequest(HitsDto dto) {
+        App app = getOrCreate(dto.getApp());
+
+        statsRepo.saveAll(HitMapper.toHit(dto, app));
+        log.info("сохранены запросы ip = {} по url = {}", dto.getIp(), dto.getUris());
     }
 
     @Override
@@ -40,9 +49,9 @@ public class StatsServiceImpl implements StatsService {
         return get(start, end, uris, unique);
     }
 
-    private App getOrCreate(HitDto dto) {
-        return appRepo.findByName(dto.getApp())
-                .orElseGet(() -> appRepo.save(AppMapper.toApp(dto)));
+    private App getOrCreate(String appName) {
+        return appRepo.findByName(appName)
+                .orElseGet(() -> appRepo.save(AppMapper.toApp(appName)));
     }
 
     private List<Stat> get(LocalDateTime start, LocalDateTime end, List<String> uris, boolean unique) {

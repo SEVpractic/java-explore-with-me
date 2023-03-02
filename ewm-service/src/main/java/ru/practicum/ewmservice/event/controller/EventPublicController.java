@@ -2,7 +2,6 @@ package ru.practicum.ewmservice.event.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.lang.Nullable;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.ewmservice.event.dto.EventFullDto;
@@ -11,6 +10,8 @@ import ru.practicum.ewmservice.event.dto.EventSorts;
 import ru.practicum.ewmservice.event.service.EventPublicService;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -24,8 +25,8 @@ public class EventPublicController {
 
     @GetMapping
     public List<EventShortDto> findByFilter(@RequestParam(name = "text", defaultValue = "") String text,
-                                            @RequestParam(name = "categories") @Nullable List<Long> categories,
-                                            @RequestParam(name = "paid", defaultValue = "false") boolean paid,
+                                            @RequestParam(name = "categories", required = false) List<Long> categories,
+                                            @RequestParam(name = "paid", required = false) Boolean paid,
                                             @RequestParam(name = "rangeStart", required = false)
                                                 LocalDateTime rangeStart,
                                             @RequestParam(name = "rangeEnd", required = false)
@@ -33,14 +34,14 @@ public class EventPublicController {
                                             @RequestParam(name = "onlyAvailable", defaultValue = "false")
                                                 boolean onlyAvailable,
                                             @RequestParam(name = "sort", defaultValue = "EVENT_DATE") EventSorts sort,
-                                            @RequestParam(name = "from", defaultValue = "0") int from,
-                                            @RequestParam(name = "size", defaultValue = "10") int size) {
+                                            @RequestParam(name = "from", defaultValue = "0") @PositiveOrZero int from,
+                                            @RequestParam(name = "size", defaultValue = "10") @Positive int size) {
         return eventPublicService.getAll(text, categories, paid, rangeStart, rangeEnd,
                 onlyAvailable, sort, from, size, request.getRemoteAddr());
     }
 
     @GetMapping("/{id}")
-    public EventFullDto getById(@PathVariable("id") long eventId) {
+    public EventFullDto getById(@PathVariable("id") @Positive long eventId) {
         return eventPublicService.getById(eventId, request.getRemoteAddr());
     }
 }

@@ -7,6 +7,8 @@ import org.springframework.web.bind.annotation.*;
 import ru.practicum.ewmservice.compilation.dto.CompilationDto;
 import ru.practicum.ewmservice.compilation.service.CompilationService;
 
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
 
 @RestController
@@ -17,9 +19,9 @@ public class CompilationPublicController {
     private final CompilationService compilationService;
 
     @GetMapping
-    public List<CompilationDto> getAll(@RequestParam(name = "pinned", defaultValue = "true") boolean pinned,
-                                       @RequestParam(name = "from", defaultValue = "0") int from,
-                                       @RequestParam(name = "size", defaultValue = "10") int size) {
+    public List<CompilationDto> getAll(@RequestParam(name = "pinned", required = false) Boolean pinned,
+                                       @RequestParam(name = "from", defaultValue = "0") @PositiveOrZero int from,
+                                       @RequestParam(name = "size", defaultValue = "10") @Positive int size) {
         return compilationService.getAll(pinned, from, size);
     }
 

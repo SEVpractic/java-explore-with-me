@@ -10,8 +10,6 @@ import javax.validation.constraints.NotEmpty;
 @Getter
 @AllArgsConstructor
 public class LocationDto {
-    @NotEmpty
     private double lat;
-    @NotEmpty
     private double lon;
 }

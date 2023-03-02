@@ -11,6 +11,7 @@ import ru.practicum.ewmservice.user.service.UserService;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
 
 @RestController
@@ -27,10 +28,10 @@ public class UserController {
     }
 
     @GetMapping
-    public List<UserDto> get(@RequestParam(name = "ids", defaultValue = "") List<Long> ids,
-                             @RequestParam(name = "from", defaultValue = "0") int from,
-                             @RequestParam(name = "size", defaultValue = "10") int size) {
-        return userService.get(ids, from, size); //В случае, если по заданным фильтрам не найдено ни одного пользователя, возвращает пустой список
+    public List<UserDto> get(@RequestParam(name = "ids", required = false) List<Long> ids,
+                             @RequestParam(name = "from", defaultValue = "0") @PositiveOrZero int from,
+                             @RequestParam(name = "size", defaultValue = "10") @Positive int size) {
+        return userService.get(ids, from, size);
     }
 
     @DeleteMapping(path = "/{userId}")

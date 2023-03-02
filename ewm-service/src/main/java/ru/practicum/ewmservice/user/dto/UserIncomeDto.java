@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
 
 @Builder(toBuilder = true)
 @Getter
@@ -14,5 +15,6 @@ public class UserIncomeDto {
     @NotBlank
     private final String name;
     @Email
+    @NotEmpty
     private final String email;
 }

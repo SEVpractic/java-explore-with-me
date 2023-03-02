@@ -11,6 +11,8 @@ import ru.practicum.ewmservice.compilation.service.CompilationService;
 import ru.practicum.ewmservice.util.validation.CreateValidationGroup;
 import ru.practicum.ewmservice.util.validation.UpdateValidationGroup;
 
+import javax.validation.constraints.Positive;
+
 @RestController
 @RequestMapping(path = "/admin/compilations")
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
@@ -32,7 +34,7 @@ public class CompilationAdminController {
 
     @DeleteMapping(path = "/{compId}")
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
-    public CompilationDto delete(@PathVariable("compId") long compId) {
+    public CompilationDto delete(@PathVariable("compId") @Positive long compId) {
         return compilationService.delete(compId);
     }
 }

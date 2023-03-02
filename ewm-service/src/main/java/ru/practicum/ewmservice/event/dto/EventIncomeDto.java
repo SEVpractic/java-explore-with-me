@@ -8,10 +8,7 @@ import lombok.Getter;
 import ru.practicum.ewmservice.util.validation.CreateValidationGroup;
 import ru.practicum.ewmservice.util.validation.UpdateValidationGroup;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Positive;
-import javax.validation.constraints.PositiveOrZero;
+import javax.validation.constraints.*;
 import java.time.LocalDateTime;
 
 @Builder(toBuilder = true)
@@ -19,8 +16,10 @@ import java.time.LocalDateTime;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class EventIncomeDto {
     @NotBlank(groups = CreateValidationGroup.class)
+    @Size(max = 512)
     private final String annotation;
-    @Positive(groups = CreateValidationGroup.class)
+    @Positive(groups = {CreateValidationGroup.class, UpdateValidationGroup.class})
+    @NotNull(groups = {CreateValidationGroup.class})
     @JsonProperty("category")
     private final Long categoryId;
     @NotBlank(groups = CreateValidationGroup.class)
@@ -33,10 +32,12 @@ public class EventIncomeDto {
     @NotNull(groups = CreateValidationGroup.class)
     private final Boolean paid;
     @PositiveOrZero(groups = {CreateValidationGroup.class, UpdateValidationGroup.class})
+    @NotNull(groups = {CreateValidationGroup.class})
     private final Integer participantLimit;
     @NotNull(groups = CreateValidationGroup.class)
     private final Boolean requestModeration;
     private final StateActions stateAction;
     @NotBlank(groups = CreateValidationGroup.class)
+    @Size(max = 256)
     private final String title;
 }

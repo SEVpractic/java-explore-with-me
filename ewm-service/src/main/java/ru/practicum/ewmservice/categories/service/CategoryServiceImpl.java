@@ -1,6 +1,8 @@
 package ru.practicum.ewmservice.categories.service;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -9,55 +11,48 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.ewmservice.categories.dto.CategoryDto;
 import ru.practicum.ewmservice.categories.model.Category;
 import ru.practicum.ewmservice.categories.storage.CategoryRepo;
-import ru.practicum.ewmservice.compilation.storage.CompilationRepo;
 import ru.practicum.ewmservice.event.storage.EventRepo;
-import ru.practicum.ewmservice.event.storage.EventStateRepo;
-import ru.practicum.ewmservice.event.storage.LocationRepo;
-import ru.practicum.ewmservice.participation_request.storage.EventRequestRepo;
-import ru.practicum.ewmservice.participation_request.storage.EventRequestStatsRepo;
-import ru.practicum.ewmservice.user.storage.UserRepo;
 import ru.practicum.ewmservice.util.UtilService;
 import ru.practicum.ewmservice.util.exceptions.OperationFailedException;
 import ru.practicum.ewmservice.util.mappers.CategoryMapper;
-import ru.practicum.statsclient.StatsClientImpl;
 
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @Slf4j
-@Transactional
-public class CategoryServiceImpl extends UtilService implements CategoryService {
-    public CategoryServiceImpl(UserRepo userRepo,
-                               EventRepo eventRepo,
-                               CategoryRepo categoryRepo,
-                               LocationRepo locationRepo,
-                               EventStateRepo eventStateRepo,
-                               CompilationRepo compilationRepo,
-                               EventRequestRepo eventRequestRepo,
-                               EventRequestStatsRepo eventRequestStatsRepo,
-                               StatsClientImpl statsClient) {
-        super(userRepo, eventRepo, categoryRepo, locationRepo, eventStateRepo,
-                compilationRepo, eventRequestRepo, eventRequestStatsRepo, statsClient);
-    }
+@Transactional(readOnly = true)
+@RequiredArgsConstructor(onConstructor_ = @Autowired)
+public class CategoryServiceImpl implements CategoryService {
+    private final UtilService utilService;
+    private final CategoryRepo categoryRepo;
+    private final EventRepo eventRepo;
 
     @Override
+    @Transactional
     public CategoryDto create(CategoryDto dto) {
         Category category = save(dto);
         log.info("Создана категория c id = {} ", category.getId());
+
         return CategoryMapper.toCategoryDto(category);
     }
 
     @Override
+    @Transactional
     public CategoryDto update(CategoryDto dto, long catId) {
-        findCategoryOrThrow(catId);
-        Category category = save(dto);
+        Category category = utilService.findCategoryOrThrow(catId);
+
+        if (dto.getName() != null && !dto.getName().isBlank()
+                && !Objects.equals(dto.getName(), category.getName())) category = save(dto);
         log.info("Обновлена категория c id = {} ", category.getId());
+
         return CategoryMapper.toCategoryDto(category);
     }
 
     @Override
+    @Transactional
     public void delete(long catId) {
-        Category category = findCategoryOrThrow(catId);
+        Category category = utilService.findCategoryOrThrow(catId);
         checkDeleteAvailable(category);
         categoryRepo.deleteById(catId);
         log.info("Удален пользователь c id = {} ", catId);
@@ -81,7 +76,7 @@ public class CategoryServiceImpl extends UtilService implements CategoryService 
 
     @Override
     public CategoryDto get(long catId) {
-        Category category = findCategoryOrThrow(catId);
+        Category category = utilService.findCategoryOrThrow(catId);
         log.info("Возвращена категория c id = {} ", catId);
         return CategoryMapper.toCategoryDto(category);
     }

@@ -1,113 +1,116 @@
 package ru.practicum.ewmservice.event.service;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.ewmservice.categories.model.Category;
-import ru.practicum.ewmservice.categories.storage.CategoryRepo;
-import ru.practicum.ewmservice.compilation.storage.CompilationRepo;
 import ru.practicum.ewmservice.event.dto.*;
 import ru.practicum.ewmservice.event.model.Event;
 import ru.practicum.ewmservice.event.model.EventStates;
 import ru.practicum.ewmservice.event.model.Location;
 import ru.practicum.ewmservice.event.storage.EventRepo;
-import ru.practicum.ewmservice.event.storage.EventStateRepo;
-import ru.practicum.ewmservice.event.storage.LocationRepo;
 import ru.practicum.ewmservice.participation_request.dto.EventRequestDto;
 import ru.practicum.ewmservice.participation_request.dto.EventRequestStats;
 import ru.practicum.ewmservice.participation_request.model.EventRequest;
 import ru.practicum.ewmservice.participation_request.model.EventRequestStat;
 import ru.practicum.ewmservice.participation_request.storage.EventRequestRepo;
-import ru.practicum.ewmservice.participation_request.storage.EventRequestStatsRepo;
 import ru.practicum.ewmservice.user.model.User;
-import ru.practicum.ewmservice.user.storage.UserRepo;
+import ru.practicum.ewmservice.util.UtilService;
 import ru.practicum.ewmservice.util.exceptions.OperationFailedException;
 import ru.practicum.ewmservice.util.mappers.EventMapper;
 import ru.practicum.ewmservice.util.mappers.EventRequestMapper;
 import ru.practicum.ewmservice.util.mappers.LocationMapper;
 import ru.practicum.ewmservice.util.mappers.ProcessRequestResulMapper;
-import ru.practicum.statsclient.StatsClientImpl;
+import ru.practicum.statsdto.Stat;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
 @Slf4j
 @Transactional(readOnly = true)
-public class EventPrivateServiceImpl extends EventSuperService implements EventPrivateService {
-    public EventPrivateServiceImpl(UserRepo userRepo,
-                                   EventRepo eventRepo,
-                                   CategoryRepo categoryRepo,
-                                   LocationRepo locationRepo,
-                                   EventStateRepo eventStateRepo,
-                                   CompilationRepo compilationRepo,
-                                   EventRequestRepo eventRequestRepo,
-                                   EventRequestStatsRepo eventRequestStatsRepo,
-                                   StatsClientImpl statsClient) {
-        super(userRepo, eventRepo, categoryRepo, locationRepo, eventStateRepo,
-                compilationRepo, eventRequestRepo, eventRequestStatsRepo, statsClient);
-    }
+@RequiredArgsConstructor(onConstructor_ = @Autowired)
+public class EventPrivateServiceImpl implements EventPrivateService {
+    private final EventRepo eventRepo;
+    private final UtilService utilService;
+    private final EventSuperService eventService;
+    private final EventRequestRepo eventRequestRepo;
 
     @Override
     @Transactional
     public EventFullDto create(EventIncomeDto dto, long userId) {
-        checkEventDate(dto, 2);
-        User initiator = findUserOrThrow(userId);
-        Category category = findCategoryOrThrow(dto.getCategoryId());
-        Location location = findLocationOrSave(LocationMapper.toLocation(dto));
+        eventService.checkEventDate(dto, 2);
+        User initiator = utilService.findUserOrThrow(userId);
+        Category category = utilService.findCategoryOrThrow(dto.getCategoryId());
+        Location location = eventService.findLocationOrSave(LocationMapper.toLocation(dto));
         Event event = EventMapper.toEvent(dto, category, location, initiator);
 
-        event.setState(findEventStateOrThrow(EventStates.PENDING));
+        event.setState(utilService.findEventStateOrThrow(EventStates.PENDING));
         event.setCreatedOn(LocalDateTime.now());
         event = eventRepo.save(event);
         log.info("Создано событие c id = {} ", event.getId());
 
-        return EventMapper.toEventFullDto(event);
+        return EventMapper.toEventFullDto(event, List.of(), Map.of());
     }
 
     @Override
     @Transactional
     public EventFullDto update(EventIncomeDto dto, long userId, long eventId) {
-        checkEventDate(dto, 2);
-        User user = findUserOrThrow(userId);
-        Event event = findEventOrThrow(eventId);
+        Map<Long, List<Stat>> views;
+        List<EventRequest> confirmedRequests;
+        eventService.checkEventDate(dto, 2);
+        User user = utilService.findUserOrThrow(userId);
+        Event event = utilService.findEventOrThrow(eventId);
 
         checkInitiator(user, event);
         checkUpdateAvailable(event);
 
-        event = update(event, dto);
+        event = eventService.update(event, dto);
+        confirmedRequests = utilService.findConfirmedRequests(event);
+        views = utilService.findViews(eventId);
         log.info("Обновлено событие c id = {} юзером с id = {}", eventId, userId);
 
-        return EventMapper.toEventFullDto(event);
+        return EventMapper.toEventFullDto(event, confirmedRequests, views);
     }
 
     @Override
     public List<EventShortDto> getAll(long userId) {
-        User initiator = findUserOrThrow(userId);
+        Map<Long, List<Stat>> views;
+        Map<Event, List<EventRequest>> confirmedRequests;
+        User initiator = utilService.findUserOrThrow(userId);
 
         List<Event> events = eventRepo.findAllByInitiator(initiator);
+        confirmedRequests = utilService.findConfirmedRequests(events);
+        views = utilService.findViews(events);
         log.info("Сформирован список ивентов пользователя c id = {} ", initiator);
 
-        return EventMapper.toEventShortDto(events);
+        return EventMapper.toEventShortDto(events, confirmedRequests, views);
     }
 
     @Override
     public EventFullDto getById(long userId, long eventId) {
-        findUserOrThrow(userId);
+        Map<Long, List<Stat>> views;
+        List<EventRequest> confirmedRequests;
+        utilService.findUserOrThrow(userId);
 
-        Event event = findEventOrThrow(eventId);
+        Event event = utilService.findEventOrThrow(eventId);
+        confirmedRequests = utilService.findConfirmedRequests(event);
+        views = utilService.findViews(eventId);
         log.info("Возвращаю событие c id = {} ", eventId);
 
-        return EventMapper.toEventFullDto(event);
+        return EventMapper.toEventFullDto(event, confirmedRequests, views);
     }
 
     @Override
     public List<EventRequestDto> getRequests(long userId, long eventId) {
         List<EventRequest> requests;
-        User user = findUserOrThrow(userId);
-        Event event = findEventOrThrow(eventId);
+        User user = utilService.findUserOrThrow(userId);
+        Event event = utilService.findEventOrThrow(eventId);
         checkInitiator(user, event);
 
         requests = findEventRequestsByEvent(event);
@@ -119,12 +122,15 @@ public class EventPrivateServiceImpl extends EventSuperService implements EventP
     @Override
     @Transactional
     public ProcessRequestResultDto processRequests(long userId, long eventId, ProcessRequestsDto dto) {
-        User user = findUserOrThrow(userId);
-        Event event = findEventOrThrow(eventId);
+        User user = utilService.findUserOrThrow(userId);
+        Event event = utilService.findEventOrThrow(eventId);
         checkInitiator(user, event);
-        checkProcessRequestsAvailable(event);
 
         List<EventRequest> requests = findEventRequestsByIds(dto.getRequestIds());
+        checkProcessRequestsAvailable(
+                event,
+                utilService.findConfirmedRequests(event)
+        );
         if (requests.isEmpty()) return ProcessRequestResultDto.builder().build();
         requests = filterRequestsByStat(requests);
 
@@ -142,14 +148,14 @@ public class EventPrivateServiceImpl extends EventSuperService implements EventP
 
     private void filterAndProcessRequests(List<EventRequest> requests, Event event) {
         if (event.getParticipantLimit() == 0) {
-            confirmRequests(requests, event);
+            confirmRequests(requests);
         } else {
-            int limit = event.getParticipantLimit() - event.getConfirmedRequests();
+            int limit = event.getParticipantLimit() - utilService.findConfirmedRequests(event).size();
 
             if (requests.size() <= limit) {
-                confirmRequests(requests, event);
+                confirmRequests(requests);
             } else if (limit > 0) {
-                confirmRequests(requests.subList(0, limit - 1), event);
+                confirmRequests(requests.subList(0, limit - 1));
                 rejectRequests(requests.subList(limit, requests.size()));
             } else {
                 rejectRequests(requests);
@@ -157,14 +163,13 @@ public class EventPrivateServiceImpl extends EventSuperService implements EventP
         }
     }
 
-    private void confirmRequests(List<EventRequest> requests, Event event) {
-        EventRequestStat stat = findRequestStatOrThrow(EventRequestStats.CONFIRMED);
+    private void confirmRequests(List<EventRequest> requests) {
+        EventRequestStat stat = utilService.findRequestStatOrThrow(EventRequestStats.CONFIRMED);
         requests.forEach(request -> request.setStatus(stat));
-        event.setConfirmedRequests(event.getConfirmedRequests() + requests.size());
     }
 
     private void rejectRequests(List<EventRequest> requests) {
-        EventRequestStat stat = findRequestStatOrThrow(EventRequestStats.REJECTED);
+        EventRequestStat stat = utilService.findRequestStatOrThrow(EventRequestStats.REJECTED);
         requests.forEach(request -> request.setStatus(stat));
     }
 
@@ -198,8 +203,8 @@ public class EventPrivateServiceImpl extends EventSuperService implements EventP
         }
     }
 
-    private void checkProcessRequestsAvailable(Event event) {
-        if (event.getParticipantLimit() - event.getConfirmedRequests() == 0) {
+    private void checkProcessRequestsAvailable(Event event, List<EventRequest> confirmedRequests) {
+        if (event.getParticipantLimit() - confirmedRequests.size() < 1) {
             throw new OperationFailedException(
                     "нельзя подтвердить заявку, если уже достигнут лимит по заявкам на данное событие "
             );

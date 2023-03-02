@@ -10,7 +10,7 @@ import java.util.List;
 public interface EventPublicService {
     List<EventShortDto> getAll(String text,
                                List<Long> categories,
-                               boolean paid,
+                               Boolean paid,
                                LocalDateTime rangeStart,
                                LocalDateTime rangeEnd,
                                boolean onlyAvailable,
