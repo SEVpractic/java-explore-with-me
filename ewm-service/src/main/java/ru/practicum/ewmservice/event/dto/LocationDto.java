@@ -4,8 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 
-import javax.validation.constraints.NotEmpty;
-
 @Builder(toBuilder = true)
 @Getter
 @AllArgsConstructor

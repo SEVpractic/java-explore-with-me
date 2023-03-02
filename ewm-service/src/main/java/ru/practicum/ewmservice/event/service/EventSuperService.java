@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import ru.practicum.ewmservice.compilation.model.Compilation;
 import ru.practicum.ewmservice.event.dto.EventIncomeDto;
 import ru.practicum.ewmservice.event.dto.EventSorts;
 import ru.practicum.ewmservice.event.dto.StateActions;
@@ -16,21 +15,13 @@ import ru.practicum.ewmservice.util.UtilService;
 import ru.practicum.ewmservice.util.exceptions.EventDateValidationException;
 import ru.practicum.ewmservice.util.exceptions.OperationFailedException;
 import ru.practicum.ewmservice.util.mappers.LocationMapper;
-import ru.practicum.ewmservice.util.mappers.ViewsMapper;
-import ru.practicum.statsclient.StatsClient;
-import ru.practicum.statsdto.Stat;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 public class EventSuperService {
     private final UtilService utilService;
-    private final StatsClient statsClient;
     private final LocationRepo locationRepo;
 
     public Event update(Event event, EventIncomeDto dto) {
