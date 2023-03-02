@@ -156,7 +156,7 @@ public class UtilService {
         );
     }
 
-    public Map<Long, List<Stat>> findViews(Compilation compilation) { // todo
+    public Map<Long, List<Stat>> findViews(Compilation compilation) {
         return ViewsMapper.toStatsMap(
                 statsClient.getStat(compilation.getEvents().stream().map(Event::getId).collect(Collectors.toList()))
         );

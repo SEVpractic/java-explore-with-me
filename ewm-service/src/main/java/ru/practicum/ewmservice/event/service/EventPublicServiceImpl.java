@@ -24,7 +24,7 @@ import java.util.stream.Collectors;
 
 @Service
 @Slf4j
-@Transactional
+@Transactional(readOnly = true)
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 public class EventPublicServiceImpl implements EventPublicService {
     private final EventRepo eventRepo;

@@ -67,9 +67,16 @@ public class StatsClientImpl implements StatsClient {
     @Override
     public List<Stat> getStat(List<Long> eventIds) {
         List<Stat> stats;
+        List<String> uris;
+
+        if (eventIds.isEmpty()) {
+            uris = List.of("/events/");
+        } else {
+            uris = eventIds.stream().map(e -> "/events/" + e).collect(Collectors.toList());
+        }
 
         try {
-            stats = get(eventIds.stream().map(e -> "/events/" + e).collect(Collectors.toList()));
+            stats = get(uris);
         } catch (RuntimeException ex) {
             stats = List.of();
             log.info(ex.getMessage());
