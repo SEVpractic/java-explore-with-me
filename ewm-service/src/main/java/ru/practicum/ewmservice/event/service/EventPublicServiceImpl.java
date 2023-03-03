@@ -1,5 +1,8 @@
 package ru.practicum.ewmservice.event.service;
 
+import com.querydsl.core.types.ExpressionUtils;
+import com.querydsl.core.types.Predicate;
+import com.querydsl.core.types.dsl.BooleanExpression;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,16 +13,22 @@ import ru.practicum.ewmservice.event.dto.EventFullDto;
 import ru.practicum.ewmservice.event.dto.EventShortDto;
 import ru.practicum.ewmservice.event.dto.EventSorts;
 import ru.practicum.ewmservice.event.model.Event;
+import ru.practicum.ewmservice.event.model.QEvent;
+import ru.practicum.ewmservice.util.storage.EventQFilter;
 import ru.practicum.ewmservice.event.storage.EventRepo;
+import ru.practicum.ewmservice.util.storage.QPredicates;
 import ru.practicum.ewmservice.participation_request.model.EventRequest;
 import ru.practicum.ewmservice.util.UtilService;
 import ru.practicum.ewmservice.util.mappers.EventMapper;
 import ru.practicum.statsclient.StatsClient;
 
+import javax.persistence.EntityManager;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+
+import static ru.practicum.ewmservice.event.model.QEvent.event;
 
 @Service
 @Slf4j
@@ -43,9 +52,13 @@ public class EventPublicServiceImpl implements EventPublicService {
         Map<Long, Integer> views;
         Map<Event, List<EventRequest>> confirmedRequests;
 
+        EventQFilter filter = fillFilter(text, categories, paid, rangeStart, rangeEnd, onlyAvailable, ip);
         Pageable pageable = eventService.createPageableBySort(sort, from, size);
-        events = findByText(text, categories, paid, rangeStart, rangeEnd, onlyAvailable, pageable);
+
+        //events = findByText(text, categories, paid, rangeStart, rangeEnd, onlyAvailable, pageable);
+        events = utilService.findByFilter(pageable, filter);
         log.info("Возвращаю коллекцию событий по запросу");
+
         confirmedRequests = utilService.findConfirmedRequests(events);
         views = utilService.findViews(events);
 
@@ -59,6 +72,7 @@ public class EventPublicServiceImpl implements EventPublicService {
     public EventFullDto getById(long eventId, String ip) {
         Map<Long, Integer> views;
         List<EventRequest> confirmedRequests;
+
         Event event = utilService.findPublicEventOrThrow(eventId);
         log.info("Возвращаю событие c id = {} ", eventId);
 
@@ -168,5 +182,18 @@ public class EventPublicServiceImpl implements EventPublicService {
                 return eventRepo.findEventsFromNow(text, categories, paid, pageable);
             }
         }
+    }
+
+    private EventQFilter fillFilter(String text, List<Long> categories, Boolean paid,
+                                    LocalDateTime rangeStart, LocalDateTime rangeEnd,
+                                    boolean onlyAvailable, String ip) {
+        return EventQFilter.builder()
+                .onlyAvailable(onlyAvailable)
+                .rangeStart(rangeStart)
+                .rangeEnd(rangeEnd)
+                .categories(categories)
+                .paid(paid)
+                .text("%" + text.trim().toLowerCase() + "%")
+                .build();
     }
 }

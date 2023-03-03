@@ -1,5 +1,6 @@
 package ru.practicum.ewmservice.util;
 
+import com.querydsl.core.types.Predicate;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,10 +27,14 @@ import ru.practicum.ewmservice.user.model.User;
 import ru.practicum.ewmservice.user.storage.UserRepo;
 import ru.practicum.ewmservice.util.exceptions.EntityNotExistException;
 import ru.practicum.ewmservice.util.mappers.ViewsMapper;
+import ru.practicum.ewmservice.util.storage.EventQFilter;
+import ru.practicum.ewmservice.util.storage.QPredicates;
 import ru.practicum.statsclient.StatsClient;
 
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static ru.practicum.ewmservice.event.model.QEvent.event;
 
 @Service
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
@@ -159,5 +164,44 @@ public class UtilService {
         return ViewsMapper.toStatsMap(
                 statsClient.getStat(compilation.getEvents().stream().map(Event::getId).collect(Collectors.toList()))
         );
+    }
+
+    public List<Event> findByFilter(Pageable pageable, EventQFilter filter) {
+        Predicate main = fillPredicate(filter);
+        Predicate text = fillTextPredicate(filter);
+        Predicate available = fillIsAvailablePredicate(filter);
+
+        Predicate predicate = QPredicates.builder()
+                .add(main)
+                .add(text)
+                .add(available)
+                .buildAnd();
+
+        return eventRepo.findAll(predicate, pageable).toList();
+    }
+
+    private Predicate fillPredicate(EventQFilter filter) {
+        return QPredicates.builder()
+                .add(filter.getUserIds(), event.id::in)
+                .add(filter.getStates(), event.state.name::in)
+                .add(filter.getCategories(), event.category.id::in)
+                .add(filter.getPaid(), event.paid::eq)
+                .add(filter.getRangeStart(), event.eventDate::after)
+                .add(filter.getRangeEnd(), event.eventDate::before)
+                .buildAnd();
+    }
+
+    private Predicate fillTextPredicate(EventQFilter filter) {
+        if (filter.getText() == null || filter.getText().isBlank()) return null;
+        return QPredicates.builder()
+                .add(event.annotation.likeIgnoreCase(filter.getText()))
+                .add(event.description.likeIgnoreCase(filter.getText()))
+                .buildOr();
+    }
+
+    private Predicate fillIsAvailablePredicate(EventQFilter filter) {
+        if (filter.isOnlyAvailable()) {
+            return event.state.id.in(2);
+        } else return null;
     }
 }

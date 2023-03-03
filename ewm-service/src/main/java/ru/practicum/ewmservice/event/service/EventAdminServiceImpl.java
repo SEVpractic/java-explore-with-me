@@ -15,6 +15,7 @@ import ru.practicum.ewmservice.event.storage.EventRepo;
 import ru.practicum.ewmservice.participation_request.model.EventRequest;
 import ru.practicum.ewmservice.util.UtilService;
 import ru.practicum.ewmservice.util.mappers.EventMapper;
+import ru.practicum.ewmservice.util.storage.EventQFilter;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -58,7 +59,10 @@ public class EventAdminServiceImpl implements EventAdminService {
         Map<Event, List<EventRequest>> confirmedRequests;
 
         Pageable pageable = eventService.createPageableBySort(EventSorts.EVENT_DATE, from, size);
-        events = findByUsersAndStates(userIds, checkSates(states), categories, rangeStart, rangeEnd, pageable);
+        EventQFilter filter = fillFilter(userIds, states, categories, rangeStart, rangeEnd);
+
+        //events = findByUsersAndStates(userIds, checkSates(states), categories, rangeStart, rangeEnd, pageable);
+        events = utilService.findByFilter(pageable, filter);
         confirmedRequests = utilService.findConfirmedRequests(events);
         views = utilService.findViews(events);
 
@@ -141,4 +145,18 @@ public class EventAdminServiceImpl implements EventAdminService {
         }
         return states.stream().map(Enum::name).collect(Collectors.toList());
      }
+
+    private EventQFilter fillFilter(List<Long> userIds,
+                                    List<EventStates> states,
+                                    List<Long> categories,
+                                    LocalDateTime rangeStart,
+                                    LocalDateTime rangeEnd) {
+        return EventQFilter.builder()
+                .userIds(userIds)
+                .states(states == null ? null : states.stream().map(Enum::name).collect(Collectors.toList()))
+                .rangeStart(rangeStart)
+                .rangeEnd(rangeEnd)
+                .categories(categories)
+                .build();
+    }
 }
