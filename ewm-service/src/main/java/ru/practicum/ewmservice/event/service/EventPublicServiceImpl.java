@@ -1,8 +1,5 @@
 package ru.practicum.ewmservice.event.service;
 
-import com.querydsl.core.types.ExpressionUtils;
-import com.querydsl.core.types.Predicate;
-import com.querydsl.core.types.dsl.BooleanExpression;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,22 +10,17 @@ import ru.practicum.ewmservice.event.dto.EventFullDto;
 import ru.practicum.ewmservice.event.dto.EventShortDto;
 import ru.practicum.ewmservice.event.dto.EventSorts;
 import ru.practicum.ewmservice.event.model.Event;
-import ru.practicum.ewmservice.event.model.QEvent;
-import ru.practicum.ewmservice.util.storage.EventQFilter;
 import ru.practicum.ewmservice.event.storage.EventRepo;
-import ru.practicum.ewmservice.util.storage.QPredicates;
 import ru.practicum.ewmservice.participation_request.model.EventRequest;
 import ru.practicum.ewmservice.util.UtilService;
 import ru.practicum.ewmservice.util.mappers.EventMapper;
+import ru.practicum.ewmservice.util.storage.EventQFilter;
 import ru.practicum.statsclient.StatsClient;
 
-import javax.persistence.EntityManager;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-
-import static ru.practicum.ewmservice.event.model.QEvent.event;
 
 @Service
 @Slf4j
