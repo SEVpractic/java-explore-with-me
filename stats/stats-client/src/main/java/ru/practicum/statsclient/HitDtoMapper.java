@@ -14,7 +14,7 @@ public class HitDtoMapper {
         return HitDto.builder()
                 .app(name)
                 .ip(ip)
-                .uri(eventId == 0 ? "/events" : "/events/" + eventId) // todo убрать
+                .uri("/events/" + eventId)
                 .timeStamp(LocalDateTime.now())
                 .build();
     }

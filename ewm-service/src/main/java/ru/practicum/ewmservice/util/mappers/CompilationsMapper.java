@@ -6,7 +6,6 @@ import ru.practicum.ewmservice.compilation.dto.CompilationIncomeDto;
 import ru.practicum.ewmservice.compilation.model.Compilation;
 import ru.practicum.ewmservice.event.model.Event;
 import ru.practicum.ewmservice.participation_request.model.EventRequest;
-import ru.practicum.statsdto.Stat;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,7 +25,7 @@ public class CompilationsMapper {
 
     public static CompilationDto toCompilationDto(Compilation compilation,
                                                   Map<Event, List<EventRequest>> confirmedRequests,
-                                                  Map<Long, List<Stat>> views) {
+                                                  Map<Long, Integer> views) {
         return CompilationDto.builder()
                 .id(compilation.getId())
                 .pinned(compilation.isPinned())
@@ -41,7 +40,7 @@ public class CompilationsMapper {
 
     public static List<CompilationDto> toCompilationDto(List<Compilation> compilations,
                                                         Map<Event, List<EventRequest>> confirmedRequests,
-                                                        Map<Long, List<Stat>> views) {
+                                                        Map<Long, Integer> views) {
         return compilations.stream()
                 .map(compilation -> toCompilationDto(
                         compilation,

@@ -15,7 +15,6 @@ import ru.practicum.ewmservice.participation_request.model.EventRequest;
 import ru.practicum.ewmservice.util.UtilService;
 import ru.practicum.ewmservice.util.mappers.EventMapper;
 import ru.practicum.statsclient.StatsClient;
-import ru.practicum.statsdto.Stat;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -41,7 +40,7 @@ public class EventPublicServiceImpl implements EventPublicService {
                                       int from, int size,
                                       String ip) {
         List<Event> events;
-        Map<Long, List<Stat>> views;
+        Map<Long, Integer> views;
         Map<Event, List<EventRequest>> confirmedRequests;
 
         Pageable pageable = eventService.createPageableBySort(sort, from, size);
@@ -58,7 +57,7 @@ public class EventPublicServiceImpl implements EventPublicService {
 
     @Override
     public EventFullDto getById(long eventId, String ip) {
-        Map<Long, List<Stat>> views;
+        Map<Long, Integer> views;
         List<EventRequest> confirmedRequests;
         Event event = utilService.findPublicEventOrThrow(eventId);
         log.info("Возвращаю событие c id = {} ", eventId);

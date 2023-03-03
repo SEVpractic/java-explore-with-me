@@ -23,7 +23,6 @@ import ru.practicum.ewmservice.util.mappers.EventMapper;
 import ru.practicum.ewmservice.util.mappers.EventRequestMapper;
 import ru.practicum.ewmservice.util.mappers.LocationMapper;
 import ru.practicum.ewmservice.util.mappers.ProcessRequestResulMapper;
-import ru.practicum.statsdto.Stat;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -61,7 +60,7 @@ public class EventPrivateServiceImpl implements EventPrivateService {
     @Override
     @Transactional
     public EventFullDto update(EventIncomeDto dto, long userId, long eventId) {
-        Map<Long, List<Stat>> views;
+        Map<Long, Integer> views;
         List<EventRequest> confirmedRequests;
         eventService.checkEventDate(dto, 2);
         User user = utilService.findUserOrThrow(userId);
@@ -80,7 +79,7 @@ public class EventPrivateServiceImpl implements EventPrivateService {
 
     @Override
     public List<EventShortDto> getAll(long userId) {
-        Map<Long, List<Stat>> views;
+        Map<Long, Integer> views;
         Map<Event, List<EventRequest>> confirmedRequests;
         User initiator = utilService.findUserOrThrow(userId);
 
@@ -94,7 +93,7 @@ public class EventPrivateServiceImpl implements EventPrivateService {
 
     @Override
     public EventFullDto getById(long userId, long eventId) {
-        Map<Long, List<Stat>> views;
+        Map<Long, Integer> views;
         List<EventRequest> confirmedRequests;
         utilService.findUserOrThrow(userId);
 

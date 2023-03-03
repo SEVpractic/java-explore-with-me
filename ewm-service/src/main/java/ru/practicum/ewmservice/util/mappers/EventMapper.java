@@ -9,7 +9,6 @@ import ru.practicum.ewmservice.event.model.Event;
 import ru.practicum.ewmservice.event.model.Location;
 import ru.practicum.ewmservice.participation_request.model.EventRequest;
 import ru.practicum.ewmservice.user.model.User;
-import ru.practicum.statsdto.Stat;
 
 import java.util.List;
 import java.util.Map;
@@ -36,7 +35,7 @@ public class EventMapper {
 
     public static EventFullDto toEventFullDto(Event event,
                                               List<EventRequest> confirmedRequests,
-                                              Map<Long, List<Stat>> views) {
+                                              Map<Long, Integer> views) {
         return EventFullDto.builder()
                 .id(event.getId())
                 .annotation(event.getAnnotation())
@@ -53,13 +52,13 @@ public class EventMapper {
                 .requestModeration(event.getRequestModeration())
                 .state(event.getState().getName())
                 .title(event.getTitle())
-                .views(getViews(event.getId(), views))
+                .views(views.getOrDefault(event.getId(), 0))
                 .build();
     }
 
     public static List<EventFullDto> toEventFullDto(List<Event> events,
                                                     Map<Event, List<EventRequest>> confirmedRequests,
-                                                    Map<Long, List<Stat>> views) {
+                                                    Map<Long, Integer> views) {
         return events.stream()
                 .map(event -> toEventFullDto(
                         event,
@@ -71,7 +70,7 @@ public class EventMapper {
 
     public static EventShortDto toEventShortDto(Event event,
                                                 List<EventRequest> confirmedRequests,
-                                                Map<Long, List<Stat>> views) {
+                                                Map<Long, Integer> views) {
         return EventShortDto.builder()
                 .id(event.getId())
                 .annotation(event.getAnnotation())
@@ -81,13 +80,13 @@ public class EventMapper {
                 .initiator(UserMapper.toUserDto(event.getInitiator()))
                 .paid(event.getPaid())
                 .title(event.getTitle())
-                .views(getViews(event.getId(), views))
+                .views(views.getOrDefault(event.getId(), 0))
                 .build();
     }
 
     public static List<EventShortDto> toEventShortDto(List<Event> events,
                                                       Map<Event, List<EventRequest>> confirmedRequests,
-                                                      Map<Long, List<Stat>> views) {
+                                                      Map<Long, Integer> views) {
         return events.stream()
                 .map(event -> toEventShortDto(
                         event,
@@ -95,13 +94,5 @@ public class EventMapper {
                         views
                 ))
                 .collect(Collectors.toList());
-    }
-
-    private static int getViews(Long eventId, Map<Long, List<Stat>> views) {
-        if (views != null && views.get(eventId) != null && views.get(eventId).get(0) != null) {
-            return views.get(eventId).get(0).getHits();
-        } else {
-            return  0;
-        }
     }
 }

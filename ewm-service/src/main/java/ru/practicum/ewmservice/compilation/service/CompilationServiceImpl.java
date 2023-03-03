@@ -15,7 +15,6 @@ import ru.practicum.ewmservice.event.storage.EventRepo;
 import ru.practicum.ewmservice.participation_request.model.EventRequest;
 import ru.practicum.ewmservice.util.UtilService;
 import ru.practicum.ewmservice.util.mappers.CompilationsMapper;
-import ru.practicum.statsdto.Stat;
 
 import java.util.*;
 
@@ -31,7 +30,7 @@ public class CompilationServiceImpl implements CompilationService {
     @Override
     @Transactional
     public CompilationDto create(CompilationIncomeDto dto) {
-        Map<Long, List<Stat>> views;
+        Map<Long, Integer> views;
         Map<Event, List<EventRequest>> confirmedRequests;
         Compilation compilation = CompilationsMapper.toCompilation(dto);
         compilation.setEvents(findEvensByIds(dto.getEventIds()));
@@ -49,7 +48,7 @@ public class CompilationServiceImpl implements CompilationService {
     @Override
     @Transactional
     public CompilationDto update(CompilationIncomeDto dto, long compId) {
-        Map<Long, List<Stat>> views;
+        Map<Long, Integer> views;
         Map<Event, List<EventRequest>> confirmedRequests;
         Compilation compilation = utilService.findCompilationOrThrow(compId);
 
@@ -71,7 +70,7 @@ public class CompilationServiceImpl implements CompilationService {
     @Override
     @Transactional
     public CompilationDto delete(long compId) {
-        Map<Long, List<Stat>> views;
+        Map<Long, Integer> views;
         Map<Event, List<EventRequest>> confirmedRequests;
         Compilation compilation = utilService.findCompilationOrThrow(compId);
 
@@ -88,7 +87,7 @@ public class CompilationServiceImpl implements CompilationService {
     @Override
     public List<CompilationDto> getAll(Boolean pinned, int from, int size) {
         Set<Event> events = new HashSet<>();
-        Map<Long, List<Stat>> views;
+        Map<Long, Integer> views;
         Map<Event, List<EventRequest>> confirmedRequests;
         List<Compilation> compilations;
         Pageable pageable = utilService.createPageable("id", from, size);
@@ -110,7 +109,7 @@ public class CompilationServiceImpl implements CompilationService {
 
     @Override
     public CompilationDto getById(long compId) {
-        Map<Long, List<Stat>> views;
+        Map<Long, Integer> views;
         Map<Event, List<EventRequest>> confirmedRequests;
 
         Compilation compilation = utilService.findCompilationOrThrow(compId);
@@ -135,7 +134,7 @@ public class CompilationServiceImpl implements CompilationService {
         return eventRepo.findByIdIn(ids);
     }
 
-    private Map<Long, List<Stat>> getViews(Compilation compilation) {
+    private Map<Long, Integer> getViews(Compilation compilation) {
         if (compilation.getEvents() != null && !compilation.getEvents().isEmpty()) {
             return utilService.findViews(compilation);
         } else {

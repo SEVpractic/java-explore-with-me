@@ -66,23 +66,9 @@ public class StatsClientImpl implements StatsClient {
 
     @Override
     public List<Stat> getStat(List<Long> eventIds) {
-        List<Stat> stats;
-        List<String> uris;
-
-        if (eventIds.isEmpty()) {
-            uris = List.of("/events/");
-        } else {
-            uris = eventIds.stream().map(e -> "/events/" + e).collect(Collectors.toList());
-        }
-
-        try {
-            stats = get(uris);
-        } catch (RuntimeException ex) {
-            stats = List.of();
-            log.info(ex.getMessage());
-        }
+        List<String> uris = fillUris(eventIds);
+        List<Stat> stats = fillStat(uris);
         log.info("отправлен запрос на статистику eventIds = {}", eventIds);
-
         return stats;
     }
 
@@ -122,5 +108,22 @@ public class StatsClientImpl implements StatsClient {
                 .contentType("application/json")
                 .asEmpty();
         log.info("отправлен запрос на сохранение запроса ip = {} по urls = {}", dto.getIp(), dto.getUris());
+    }
+
+    private List<String> fillUris(List<Long> eventIds) {
+        if (eventIds.isEmpty()) {
+            return List.of("/events/");
+        } else {
+            return eventIds.stream().map(e -> "/events/" + e).collect(Collectors.toList());
+        }
+    }
+
+    private List<Stat> fillStat(List<String> uris) {
+        try {
+            return get(uris);
+        } catch (RuntimeException ex) {
+            log.info(ex.getMessage());
+            return List.of();
+        }
     }
 }

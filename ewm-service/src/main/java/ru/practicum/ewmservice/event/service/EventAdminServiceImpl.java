@@ -15,7 +15,6 @@ import ru.practicum.ewmservice.event.storage.EventRepo;
 import ru.practicum.ewmservice.participation_request.model.EventRequest;
 import ru.practicum.ewmservice.util.UtilService;
 import ru.practicum.ewmservice.util.mappers.EventMapper;
-import ru.practicum.statsdto.Stat;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -34,7 +33,7 @@ public class EventAdminServiceImpl implements EventAdminService {
     @Override
     @Transactional
     public EventFullDto update(EventIncomeDto dto, long eventId) {
-        Map<Long, List<Stat>> views;
+        Map<Long, Integer> views;
         List<EventRequest> confirmedRequests;
         eventService.checkEventDate(dto, 1);
         Event event = utilService.findEventOrThrow(eventId);
@@ -55,7 +54,7 @@ public class EventAdminServiceImpl implements EventAdminService {
                                      LocalDateTime rangeEnd,
                                      int from, int size) {
         List<Event> events;
-        Map<Long, List<Stat>> views;
+        Map<Long, Integer> views;
         Map<Event, List<EventRequest>> confirmedRequests;
 
         Pageable pageable = eventService.createPageableBySort(EventSorts.EVENT_DATE, from, size);

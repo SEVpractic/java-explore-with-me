@@ -5,18 +5,16 @@ import ru.practicum.statsdto.Stat;
 
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.toMap;
 
 @UtilityClass
 public class ViewsMapper {
 
-    public static Map<Long, List<Stat>> toStatsMap(List<Stat> stats) {
+    public static Map<Long, Integer> toStatsMap(List<Stat> stats) {
         return stats.stream()
                 .collect(
-                        Collectors.groupingBy(
-                                stat -> Long.valueOf(stat.getUri().substring(8)),
-                                Collectors.toList()
-                        )
+                        toMap(stat -> Long.valueOf(stat.getUri().substring(8)), Stat::getHits)
                 );
     }
 }

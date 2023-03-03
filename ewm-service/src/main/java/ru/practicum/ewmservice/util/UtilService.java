@@ -27,7 +27,6 @@ import ru.practicum.ewmservice.user.storage.UserRepo;
 import ru.practicum.ewmservice.util.exceptions.EntityNotExistException;
 import ru.practicum.ewmservice.util.mappers.ViewsMapper;
 import ru.practicum.statsclient.StatsClient;
-import ru.practicum.statsdto.Stat;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -138,25 +137,25 @@ public class UtilService {
         return findConfirmedRequests(new ArrayList<>(events));
     }
 
-    public Map<Long, List<Stat>> findViews(List<Event> events) {
+    public Map<Long, Integer> findViews(List<Event> events) {
         return ViewsMapper.toStatsMap(
                 statsClient.getStat(events.stream().map(Event::getId).collect(Collectors.toList()))
         );
     }
 
-    public Map<Long, List<Stat>> findViews(Set<Event> events) {
+    public Map<Long, Integer> findViews(Set<Event> events) {
         return ViewsMapper.toStatsMap(
                 statsClient.getStat(events.stream().map(Event::getId).collect(Collectors.toList()))
         );
     }
 
-    public Map<Long, List<Stat>> findViews(Long eventId) {
+    public Map<Long, Integer> findViews(Long eventId) {
         return ViewsMapper.toStatsMap(
                 statsClient.getStat(List.of(eventId))
         );
     }
 
-    public Map<Long, List<Stat>> findViews(Compilation compilation) {
+    public Map<Long, Integer> findViews(Compilation compilation) {
         return ViewsMapper.toStatsMap(
                 statsClient.getStat(compilation.getEvents().stream().map(Event::getId).collect(Collectors.toList()))
         );

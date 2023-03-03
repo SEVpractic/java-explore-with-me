@@ -42,8 +42,7 @@ public class CategoryServiceImpl implements CategoryService {
     public CategoryDto update(CategoryDto dto, long catId) {
         Category category = utilService.findCategoryOrThrow(catId);
 
-        if (dto.getName() != null && !dto.getName().isBlank()
-                && !Objects.equals(dto.getName(), category.getName())) category = save(dto);
+        if (!Objects.equals(dto.getName(), category.getName())) category.setName(dto.getName());
         log.info("Обновлена категория c id = {} ", category.getId());
 
         return CategoryMapper.toCategoryDto(category);
