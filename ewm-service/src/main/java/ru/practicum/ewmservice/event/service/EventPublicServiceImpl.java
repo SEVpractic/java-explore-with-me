@@ -47,7 +47,6 @@ public class EventPublicServiceImpl implements EventPublicService {
         EventQFilter filter = fillFilter(text, categories, paid, rangeStart, rangeEnd, onlyAvailable, ip);
         Pageable pageable = eventService.createPageableBySort(sort, from, size);
 
-        //events = findByText(text, categories, paid, rangeStart, rangeEnd, onlyAvailable, pageable);
         events = utilService.findByFilter(pageable, filter);
         log.info("Возвращаю коллекцию событий по запросу");
 

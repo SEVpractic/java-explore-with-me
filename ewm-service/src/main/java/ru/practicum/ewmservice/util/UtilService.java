@@ -177,12 +177,13 @@ public class UtilService {
                 .add(available)
                 .buildAnd();
 
+
         return eventRepo.findAll(predicate, pageable).toList();
     }
 
     private Predicate fillPredicate(EventQFilter filter) {
         return QPredicates.builder()
-                .add(filter.getUserIds(), event.id::in)
+                .add(filter.getUserIds(), event.initiator.id::in)
                 .add(filter.getStates(), event.state.name::in)
                 .add(filter.getCategories(), event.category.id::in)
                 .add(filter.getPaid(), event.paid::eq)
