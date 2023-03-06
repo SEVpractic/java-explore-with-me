@@ -6,10 +6,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.statsdto.HitDto;
-import ru.practicum.statsdto.HitOutputDto;
+import ru.practicum.statsdto.HitsDto;
 import ru.practicum.statsdto.Stat;
 import ru.practicum.statsservice.model.App;
-import ru.practicum.statsservice.model.Hit;
 import ru.practicum.statsservice.storage.AppRepo;
 import ru.practicum.statsservice.storage.StatsRepo;
 import ru.practicum.statsservice.util.AppMapper;
@@ -17,7 +16,7 @@ import ru.practicum.statsservice.util.HitMapper;
 import ru.practicum.statsservice.util.exception.InvalidPeriodException;
 
 import java.time.LocalDateTime;
-import java.util.List;
+import java.util.*;
 
 @Service
 @Slf4j
@@ -28,13 +27,19 @@ public class StatsServiceImpl implements StatsService {
     private final StatsRepo statsRepo;
 
     @Override
-    public HitOutputDto saveRequest(HitDto dto) {
-        App app = getOrCreate(dto);
+    public void saveRequest(HitDto dto) {
+        App app = getOrCreate(dto.getApp());
 
-        Hit hit = statsRepo.save(HitMapper.toHit(dto, app));
+        statsRepo.save(HitMapper.toHit(dto, app));
         log.info("сохранен запрос ip = {} по url = {}", dto.getIp(), dto.getUri());
+    }
 
-        return HitMapper.toOutputDto(hit);
+    @Override
+    public void saveRequest(HitsDto dto) {
+        App app = getOrCreate(dto.getApp());
+
+        statsRepo.saveAll(HitMapper.toHit(dto, app));
+        log.info("сохранены запросы ip = {} по url = {}", dto.getIp(), dto.getUris());
     }
 
     @Override
@@ -44,9 +49,9 @@ public class StatsServiceImpl implements StatsService {
         return get(start, end, uris, unique);
     }
 
-    private App getOrCreate(HitDto dto) {
-        return appRepo.findByName(dto.getApp())
-                .orElseGet(() -> appRepo.save(AppMapper.toApp(dto)));
+    private App getOrCreate(String appName) {
+        return appRepo.findByName(appName)
+                .orElseGet(() -> appRepo.save(AppMapper.toApp(appName)));
     }
 
     private List<Stat> get(LocalDateTime start, LocalDateTime end, List<String> uris, boolean unique) {
