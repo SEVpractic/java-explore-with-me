@@ -63,7 +63,15 @@ public class EventAdminServiceImpl implements EventAdminService {
         confirmedRequests = utilService.findConfirmedRequests(events);
         views = utilService.findViews(events);
 
+        log.info("Возвращаю список событий по запросу администратора");
+
         return EventMapper.toEventFullDto(events, confirmedRequests, views);
+    }
+
+    @Override
+    public List<EventFullDto> getWaiting(int from, int size) {
+        return getAll(null, List.of(EventStates.PENDING),
+                null, null, null, from, size);
     }
 
     private EventQFilter fillFilter(List<Long> userIds,

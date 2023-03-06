@@ -40,4 +40,10 @@ public class EventAdminController {
                                            @RequestParam(name = "size", defaultValue = "10") @Positive int size) {
         return eventAdminServiceService.getAll(userIds, states, categories, rangeStart, rangeEnd, from, size);
     }
+
+    @GetMapping("/moderation")
+    public List<EventFullDto> findWaiting(@RequestParam(name = "from", defaultValue = "0") @PositiveOrZero int from,
+                                          @RequestParam(name = "size", defaultValue = "10") @Positive int size) {
+        return eventAdminServiceService.getWaiting(from, size);
+    }
 }

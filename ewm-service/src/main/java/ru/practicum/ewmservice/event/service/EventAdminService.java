@@ -17,4 +17,6 @@ public interface EventAdminService {
                               LocalDateTime rangeStart,
                               LocalDateTime rangeEnd,
                               int from, int size);
+
+    List<EventFullDto> getWaiting(int from, int size);
 }
