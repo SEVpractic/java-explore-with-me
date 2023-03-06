@@ -33,14 +33,13 @@ public class EventSuperService {
         if (dto.getPaid() != null) event.setPaid(dto.getPaid());
         if (dto.getParticipantLimit() != null) event.setParticipantLimit(dto.getParticipantLimit());
         if (dto.getRequestModeration() != null) event.setRequestModeration(dto.getRequestModeration());
-        if (dto.getStateAction() != null) updateState(event, dto);
+        if (dto.getStateAction() != null) updateState(event, dto.getStateAction());
         if (dto.getTitle() != null && !dto.getTitle().isBlank()) event.setTitle(dto.getTitle());
 
         return event;
     }
 
-    private void updateState(Event event, EventIncomeDto dto) {
-        StateActions action = dto.getStateAction();
+    private void updateState(Event event, StateActions action) {
         switch (action) {
             case CANCEL_REVIEW:
                 updateToCancel(event);

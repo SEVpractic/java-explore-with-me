@@ -21,6 +21,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static java.util.stream.Collectors.toMap;
+
 @Service
 @Slf4j
 @Transactional(readOnly = true)
@@ -40,9 +42,25 @@ public class EventAdminServiceImpl implements EventAdminService {
         event = eventService.update(event, dto);
         confirmedRequests = utilService.findConfirmedRequests(event);
         views = utilService.findViews(eventId);
-        log.info("Обновлено событие c id = {} администратором", eventId);
 
+        log.info("Обновлено событие c id = {} администратором", eventId);
         return EventMapper.toEventFullDto(event, confirmedRequests, views);
+    }
+
+    @Override
+    @Transactional
+    public List<EventFullDto> updateAll(List<EventIncomeDto> dto) {
+        List<Event> events = getAll(dto.stream().map(EventIncomeDto::getEventId).collect(Collectors.toList()),
+                null, null, null, null, null, 0, dto.size());
+        Map<Long, Integer> views = utilService.findViews(events);
+        Map<Event, List<EventRequest>> confirmedRequests = utilService.findConfirmedRequests(events);
+
+        Map<Long, EventIncomeDto> dtoMap = dto.stream().collect(toMap(EventIncomeDto::getEventId, i -> i));
+        events.forEach(e -> eventService.update(e, dtoMap.get(e.getId())));
+
+        log.info("Обновлен перечень событий администратором");
+        return EventMapper.toEventFullDto(events, confirmedRequests, views);
+        // todo добавить функционал по сохранению сообщения при отклонении мероприятий админом
     }
 
     @Override
@@ -52,19 +70,11 @@ public class EventAdminServiceImpl implements EventAdminService {
                                      LocalDateTime rangeStart,
                                      LocalDateTime rangeEnd,
                                      int from, int size) {
-        List<Event> events;
-        Map<Long, Integer> views;
-        Map<Event, List<EventRequest>> confirmedRequests;
-
-        Pageable pageable = eventService.createPageableBySort(EventSorts.EVENT_DATE, from, size);
-        EventQFilter filter = fillFilter(userIds, states, categories, rangeStart, rangeEnd);
-
-        events = utilService.findByFilter(pageable, filter);
-        confirmedRequests = utilService.findConfirmedRequests(events);
-        views = utilService.findViews(events);
+        List<Event> events = getAll(null, userIds, states, categories, rangeStart, rangeEnd, from, size);
+        Map<Long, Integer> views = utilService.findViews(events);
+        Map<Event, List<EventRequest>> confirmedRequests = utilService.findConfirmedRequests(events);
 
         log.info("Возвращаю список событий по запросу администратора");
-
         return EventMapper.toEventFullDto(events, confirmedRequests, views);
     }
 
@@ -74,17 +84,36 @@ public class EventAdminServiceImpl implements EventAdminService {
                 null, null, null, from, size);
     }
 
+    private List<Event> getAll(List<Long> eventIds,
+                               List<Long> userIds,
+                               List<EventStates> states,
+                               List<Long> categories,
+                               LocalDateTime rangeStart,
+                               LocalDateTime rangeEnd,
+                               int from, int size) {
+        List<Event> events;
+
+        Pageable pageable = eventService.createPageableBySort(EventSorts.EVENT_DATE, from, size);
+        EventQFilter filter = fillFilter(userIds, states, categories, rangeStart, rangeEnd, eventIds);
+
+        events = utilService.findByFilter(pageable, filter);
+
+        return events;
+    }
+
     private EventQFilter fillFilter(List<Long> userIds,
                                     List<EventStates> states,
                                     List<Long> categories,
                                     LocalDateTime rangeStart,
-                                    LocalDateTime rangeEnd) {
+                                    LocalDateTime rangeEnd,
+                                    List<Long> eventIds) {
         return EventQFilter.builder()
                 .userIds(userIds)
                 .states(states == null ? null : states.stream().map(Enum::name).collect(Collectors.toList()))
                 .rangeStart(rangeStart)
                 .rangeEnd(rangeEnd)
                 .categories(categories)
+                .eventIds(eventIds)
                 .build();
     }
 }

@@ -1,5 +1,6 @@
 package ru.practicum.ewmservice.event.service;
 
+import ru.practicum.ewmservice.event.dto.EventIncomeShortDto;
 import ru.practicum.ewmservice.event.dto.EventFullDto;
 import ru.practicum.ewmservice.event.dto.EventIncomeDto;
 import ru.practicum.ewmservice.event.model.EventStates;
@@ -19,4 +20,7 @@ public interface EventAdminService {
                               int from, int size);
 
     List<EventFullDto> getWaiting(int from, int size);
+
+    List<EventFullDto> updateAll(List<EventIncomeDto> dto);
+
 }

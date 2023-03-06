@@ -40,4 +40,9 @@ public class EventIncomeDto {
     @NotBlank(groups = CreateValidationGroup.class)
     @Size(max = 256)
     private final String title;
+    @NotNull(groups = UpdateValidationGroup.class)
+    @Positive
+    @JsonProperty("id")
+    private final Long eventId;
+    private final String comment;
 }
