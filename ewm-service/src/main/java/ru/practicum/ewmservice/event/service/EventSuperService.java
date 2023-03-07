@@ -7,22 +7,27 @@ import org.springframework.stereotype.Service;
 import ru.practicum.ewmservice.event.dto.EventIncomeDto;
 import ru.practicum.ewmservice.event.dto.EventSorts;
 import ru.practicum.ewmservice.event.dto.StateActions;
+import ru.practicum.ewmservice.event.model.AdminComment;
 import ru.practicum.ewmservice.event.model.Event;
 import ru.practicum.ewmservice.event.model.EventStates;
 import ru.practicum.ewmservice.event.model.Location;
+import ru.practicum.ewmservice.event.storage.AdminCommentRepo;
 import ru.practicum.ewmservice.event.storage.LocationRepo;
 import ru.practicum.ewmservice.util.UtilService;
 import ru.practicum.ewmservice.util.exceptions.EventDateValidationException;
 import ru.practicum.ewmservice.util.exceptions.OperationFailedException;
+import ru.practicum.ewmservice.util.mappers.AdminCommentMapper;
 import ru.practicum.ewmservice.util.mappers.LocationMapper;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 public class EventSuperService {
     private final UtilService utilService;
     private final LocationRepo locationRepo;
+    private final AdminCommentRepo commentRepo;
 
     public Event update(Event event, EventIncomeDto dto) {
         if (dto.getAnnotation() != null && !dto.getAnnotation().isBlank()) event.setAnnotation(dto.getAnnotation());
@@ -115,5 +120,22 @@ public class EventSuperService {
                     String.format("Время между началом события и текущем моментом не может быть меньше %s часов", hours)
             );
         }
+    }
+
+    public void saveAdminComment(Long eventId, EventIncomeDto dto) {
+        if (dto.getComment() != null && !dto.getComment().isBlank()
+                && dto.getStateAction().name().equals(StateActions.REJECT_EVENT.name())) {
+            AdminComment comment = AdminCommentMapper.toAdminComment(eventId, dto);
+            comment.setCreatedOn(LocalDateTime.now());
+
+            commentRepo.save(comment);
+        }
+    }
+
+    public void saveAdminComment(List<EventIncomeDto> dto) {
+        List<AdminComment> comments = AdminCommentMapper.toAdminComment(dto);
+        comments.forEach(comment -> comment.setCreatedOn(LocalDateTime.now()));
+
+        commentRepo.saveAll(comments);
     }
 }

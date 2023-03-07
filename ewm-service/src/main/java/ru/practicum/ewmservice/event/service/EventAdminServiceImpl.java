@@ -43,6 +43,8 @@ public class EventAdminServiceImpl implements EventAdminService {
         confirmedRequests = utilService.findConfirmedRequests(event);
         views = utilService.findViews(eventId);
 
+        eventService.saveAdminComment(eventId, dto);
+
         log.info("Обновлено событие c id = {} администратором", eventId);
         return EventMapper.toEventFullDto(event, confirmedRequests, views);
     }
@@ -56,11 +58,12 @@ public class EventAdminServiceImpl implements EventAdminService {
         Map<Event, List<EventRequest>> confirmedRequests = utilService.findConfirmedRequests(events);
 
         Map<Long, EventIncomeDto> dtoMap = dto.stream().collect(toMap(EventIncomeDto::getEventId, i -> i));
-        events.forEach(e -> eventService.update(e, dtoMap.get(e.getId())));
+        events.forEach(event -> eventService.update(event, dtoMap.get(event.getId())));
+
+        eventService.saveAdminComment(dto);
 
         log.info("Обновлен перечень событий администратором");
         return EventMapper.toEventFullDto(events, confirmedRequests, views);
-        // todo добавить функционал по сохранению сообщения при отклонении мероприятий админом
     }
 
     @Override
@@ -80,8 +83,13 @@ public class EventAdminServiceImpl implements EventAdminService {
 
     @Override
     public List<EventFullDto> getWaiting(int from, int size) {
-        return getAll(null, List.of(EventStates.PENDING),
+        List<Event> events = getAll(null, null, List.of(EventStates.PENDING),
                 null, null, null, from, size);
+        Map<Long, Integer> views = utilService.findViews(events);
+        Map<Event, List<EventRequest>> confirmedRequests = utilService.findConfirmedRequests(events);
+
+        log.info("Возвращаю список событий по запросу администратора");
+        return EventMapper.toEventFullDto(events, confirmedRequests, views);
     }
 
     private List<Event> getAll(List<Long> eventIds,

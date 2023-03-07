@@ -4,14 +4,13 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.ewmservice.event.dto.EventIncomeShortDto;
 import ru.practicum.ewmservice.event.dto.EventFullDto;
 import ru.practicum.ewmservice.event.dto.EventIncomeDto;
 import ru.practicum.ewmservice.event.model.EventStates;
 import ru.practicum.ewmservice.event.service.EventAdminService;
+import ru.practicum.ewmservice.util.validation.AdminValidationGroup;
 import ru.practicum.ewmservice.util.validation.UpdateValidationGroup;
 
-import javax.validation.Valid;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
 import java.time.LocalDateTime;
@@ -31,7 +30,7 @@ public class EventAdminController {
     }
 
     @PostMapping(path = "/moderation")
-    public List<EventFullDto> updateAll(@Validated(UpdateValidationGroup.class) @RequestBody List<EventIncomeDto> dto) {
+    public List<EventFullDto> updateAll(@Validated(AdminValidationGroup.class) @RequestBody List<EventIncomeDto> dto) {
         return eventAdminServiceService.updateAll(dto);
     }
 
