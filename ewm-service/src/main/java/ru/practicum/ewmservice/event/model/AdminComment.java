@@ -15,8 +15,9 @@ public class AdminComment {
     @Column(name = "admin_comment_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long commentId;
-    @Column(name = "event_id")
-    private Long eventId;
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "event_id")
+    private Event event;
     @Column(name = "created")
     private LocalDateTime createdOn; // Дата и время создания комментария
     @Column(name = "text")

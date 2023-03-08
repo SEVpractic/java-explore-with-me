@@ -1,31 +1,38 @@
 package ru.practicum.ewmservice.util.mappers;
 
 import lombok.experimental.UtilityClass;
+import ru.practicum.ewmservice.event.dto.AdminCommentDto;
 import ru.practicum.ewmservice.event.dto.EventIncomeDto;
-import ru.practicum.ewmservice.event.dto.StateActions;
 import ru.practicum.ewmservice.event.model.AdminComment;
+import ru.practicum.ewmservice.event.model.Event;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @UtilityClass
 public class AdminCommentMapper {
 
-    public static AdminComment toAdminComment(Long eventId, EventIncomeDto dto) {
+    public static AdminComment toAdminComment(EventIncomeDto dto, Event event) {
         AdminComment adminComment = new AdminComment();
 
         adminComment.setText(dto.getComment());
-        adminComment.setEventId(eventId);
+        adminComment.setEvent(event);
 
         return adminComment;
     }
 
-    public static List<AdminComment> toAdminComment(List<EventIncomeDto> dto) {
+    public static List<AdminComment> toAdminComment(List<EventIncomeDto> dto, Map<Long, Event> events) {
         return dto.stream()
-                .filter(d -> d.getStateAction() != null)
-                .filter(d -> d.getStateAction().equals(StateActions.REJECT_EVENT))
-                .filter(d -> d.getComment() != null && !d.getComment().isBlank())
-                .map(d -> toAdminComment(d.getEventId(), d))
+                .map(d -> toAdminComment(d, events.get(d.getEventId())))
                 .collect(Collectors.toList());
+    }
+
+    public static AdminCommentDto toAdminCommentDto(AdminComment comment) {
+        return AdminCommentDto.builder()
+                .commentId(comment.getCommentId())
+                .createdOn(comment.getCreatedOn())
+                .text(comment.getText())
+                .build();
     }
 }

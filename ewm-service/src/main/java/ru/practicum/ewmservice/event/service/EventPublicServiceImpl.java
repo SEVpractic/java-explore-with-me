@@ -71,7 +71,7 @@ public class EventPublicServiceImpl implements EventPublicService {
         statsClient.saveHit(eventId, ip);
         log.info("Сохраняю в сервере статистики");
 
-        return EventMapper.toEventFullDto(event, confirmedRequests, views);
+        return EventMapper.toEventFullDto(event, confirmedRequests, views, Map.of());
     }
 
     private EventQFilter fillFilter(String text, List<Long> categories, Boolean paid,

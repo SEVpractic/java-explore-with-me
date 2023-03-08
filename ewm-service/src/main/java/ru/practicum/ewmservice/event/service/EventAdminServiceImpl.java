@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.ewmservice.event.dto.EventFullDto;
 import ru.practicum.ewmservice.event.dto.EventIncomeDto;
 import ru.practicum.ewmservice.event.dto.EventSorts;
+import ru.practicum.ewmservice.event.model.AdminComment;
 import ru.practicum.ewmservice.event.model.Event;
 import ru.practicum.ewmservice.event.model.EventStates;
 import ru.practicum.ewmservice.participation_request.model.EventRequest;
@@ -36,6 +37,7 @@ public class EventAdminServiceImpl implements EventAdminService {
     public EventFullDto update(EventIncomeDto dto, long eventId) {
         Map<Long, Integer> views;
         List<EventRequest> confirmedRequests;
+        Map<Long, AdminComment> comments;
         eventService.checkEventDate(dto, 1);
         Event event = utilService.findEventOrThrow(eventId);
 
@@ -43,15 +45,16 @@ public class EventAdminServiceImpl implements EventAdminService {
         confirmedRequests = utilService.findConfirmedRequests(event);
         views = utilService.findViews(eventId);
 
-        eventService.saveAdminComment(eventId, dto);
+        comments = eventService.saveAdminComment(List.of(dto), List.of(event));
 
         log.info("Обновлено событие c id = {} администратором", eventId);
-        return EventMapper.toEventFullDto(event, confirmedRequests, views);
+        return EventMapper.toEventFullDto(event, confirmedRequests, views, comments); // todo map!
     }
 
     @Override
     @Transactional
     public List<EventFullDto> updateAll(List<EventIncomeDto> dto) {
+        Map<Long, AdminComment> comments;
         List<Event> events = getAll(dto.stream().map(EventIncomeDto::getEventId).collect(Collectors.toList()),
                 null, null, null, null, null, 0, dto.size());
         Map<Long, Integer> views = utilService.findViews(events);
@@ -60,10 +63,10 @@ public class EventAdminServiceImpl implements EventAdminService {
         Map<Long, EventIncomeDto> dtoMap = dto.stream().collect(toMap(EventIncomeDto::getEventId, i -> i));
         events.forEach(event -> eventService.update(event, dtoMap.get(event.getId())));
 
-        eventService.saveAdminComment(dto);
+        comments = eventService.saveAdminComment(dto, events);
 
         log.info("Обновлен перечень событий администратором");
-        return EventMapper.toEventFullDto(events, confirmedRequests, views);
+        return EventMapper.toEventFullDto(events, confirmedRequests, views, comments); // todo map!
     }
 
     @Override
@@ -76,20 +79,21 @@ public class EventAdminServiceImpl implements EventAdminService {
         List<Event> events = getAll(null, userIds, states, categories, rangeStart, rangeEnd, from, size);
         Map<Long, Integer> views = utilService.findViews(events);
         Map<Event, List<EventRequest>> confirmedRequests = utilService.findConfirmedRequests(events);
+        Map<Long, AdminComment> comments = utilService.findByEventId(events);
 
         log.info("Возвращаю список событий по запросу администратора");
-        return EventMapper.toEventFullDto(events, confirmedRequests, views);
+        return EventMapper.toEventFullDto(events, confirmedRequests, views, comments); // todo map!
     }
 
     @Override
-    public List<EventFullDto> getWaiting(int from, int size) {
+    public List<EventFullDto> getWaiting(int from, int size) { // todo убрать метод, переделать запрос из контроллера
         List<Event> events = getAll(null, null, List.of(EventStates.PENDING),
                 null, null, null, from, size);
         Map<Long, Integer> views = utilService.findViews(events);
         Map<Event, List<EventRequest>> confirmedRequests = utilService.findConfirmedRequests(events);
 
         log.info("Возвращаю список событий по запросу администратора");
-        return EventMapper.toEventFullDto(events, confirmedRequests, views);
+        return EventMapper.toEventFullDto(events, confirmedRequests, views, Map.of());
     }
 
     private List<Event> getAll(List<Long> eventIds,

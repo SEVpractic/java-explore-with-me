@@ -21,6 +21,8 @@ import ru.practicum.ewmservice.util.mappers.LocationMapper;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
@@ -122,20 +124,26 @@ public class EventSuperService {
         }
     }
 
-    public void saveAdminComment(Long eventId, EventIncomeDto dto) {
-        if (dto.getComment() != null && !dto.getComment().isBlank()
-                && dto.getStateAction().name().equals(StateActions.REJECT_EVENT.name())) {
-            AdminComment comment = AdminCommentMapper.toAdminComment(eventId, dto);
-            comment.setCreatedOn(LocalDateTime.now());
+    public Map<Long, AdminComment> saveAdminComment(List<EventIncomeDto> dto, List<Event> events) {
+        Map<Long, Event> eventsBeId = events.stream().collect(Collectors.toMap(Event::getId, e -> e));
+        dto = dto.stream()
+                .filter(d -> d.getStateAction() != null)
+                .filter(d -> d.getStateAction().equals(StateActions.REJECT_EVENT))
+                .filter(d -> d.getComment() != null && !d.getComment().isBlank())
+                .collect(Collectors.toList());
 
-            commentRepo.save(comment);
-        }
-    }
-
-    public void saveAdminComment(List<EventIncomeDto> dto) {
-        List<AdminComment> comments = AdminCommentMapper.toAdminComment(dto);
+        List<AdminComment> comments = AdminCommentMapper.toAdminComment(dto, eventsBeId);
         comments.forEach(comment -> comment.setCreatedOn(LocalDateTime.now()));
 
-        commentRepo.saveAll(comments);
+        comments = commentRepo.saveAll(comments);
+
+        if (comments.isEmpty()) {
+            return Map.of();
+        } else {
+            return comments.stream()
+                    .collect(
+                            Collectors.toMap(comment -> comment.getEvent().getId(), comment -> comment)
+                    );
+        }
     }
 }

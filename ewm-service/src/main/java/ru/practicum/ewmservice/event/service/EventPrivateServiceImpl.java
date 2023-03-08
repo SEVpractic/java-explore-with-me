@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.ewmservice.categories.model.Category;
 import ru.practicum.ewmservice.event.dto.*;
+import ru.practicum.ewmservice.event.model.AdminComment;
 import ru.practicum.ewmservice.event.model.Event;
 import ru.practicum.ewmservice.event.model.EventStates;
 import ru.practicum.ewmservice.event.model.Location;
@@ -54,7 +55,7 @@ public class EventPrivateServiceImpl implements EventPrivateService {
         event = eventRepo.save(event);
         log.info("Создано событие c id = {} ", event.getId());
 
-        return EventMapper.toEventFullDto(event, List.of(), Map.of());
+        return EventMapper.toEventFullDto(event, List.of(), Map.of(), Map.of());
     }
 
     @Override
@@ -62,6 +63,7 @@ public class EventPrivateServiceImpl implements EventPrivateService {
     public EventFullDto update(EventIncomeDto dto, long userId, long eventId) {
         Map<Long, Integer> views;
         List<EventRequest> confirmedRequests;
+        Map<Long, AdminComment> comments;
         eventService.checkEventDate(dto, 2);
         User user = utilService.findUserOrThrow(userId);
         Event event = utilService.findEventOrThrow(eventId);
@@ -72,9 +74,10 @@ public class EventPrivateServiceImpl implements EventPrivateService {
         event = eventService.update(event, dto);
         confirmedRequests = utilService.findConfirmedRequests(event);
         views = utilService.findViews(eventId);
+        comments = utilService.findByEventId(List.of(event));
         log.info("Обновлено событие c id = {} юзером с id = {}", eventId, userId);
 
-        return EventMapper.toEventFullDto(event, confirmedRequests, views);
+        return EventMapper.toEventFullDto(event, confirmedRequests, views, comments); // todo map!
     }
 
     @Override
@@ -95,14 +98,17 @@ public class EventPrivateServiceImpl implements EventPrivateService {
     public EventFullDto getById(long userId, long eventId) {
         Map<Long, Integer> views;
         List<EventRequest> confirmedRequests;
+        Map<Long, AdminComment> comments;
         utilService.findUserOrThrow(userId);
 
         Event event = utilService.findEventOrThrow(eventId);
         confirmedRequests = utilService.findConfirmedRequests(event);
         views = utilService.findViews(eventId);
+        comments = utilService.findByEventId(List.of(event));
+
         log.info("Возвращаю событие c id = {} ", eventId);
 
-        return EventMapper.toEventFullDto(event, confirmedRequests, views);
+        return EventMapper.toEventFullDto(event, confirmedRequests, views, comments); // todo map!
     }
 
     @Override

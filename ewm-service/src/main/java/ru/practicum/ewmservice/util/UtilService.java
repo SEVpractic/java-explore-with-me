@@ -13,9 +13,11 @@ import ru.practicum.ewmservice.categories.model.Category;
 import ru.practicum.ewmservice.categories.storage.CategoryRepo;
 import ru.practicum.ewmservice.compilation.model.Compilation;
 import ru.practicum.ewmservice.compilation.storage.CompilationRepo;
+import ru.practicum.ewmservice.event.model.AdminComment;
 import ru.practicum.ewmservice.event.model.Event;
 import ru.practicum.ewmservice.event.model.EventState;
 import ru.practicum.ewmservice.event.model.EventStates;
+import ru.practicum.ewmservice.event.storage.AdminCommentRepo;
 import ru.practicum.ewmservice.event.storage.EventRepo;
 import ru.practicum.ewmservice.event.storage.EventStateRepo;
 import ru.practicum.ewmservice.participation_request.dto.EventRequestStats;
@@ -48,6 +50,7 @@ public class UtilService {
     private final EventRequestRepo requestRepo;
     private final EventStateRepo eventStateRepo;
     private final CompilationRepo compilationRepo;
+    private final AdminCommentRepo adminCommentRepo;
     private final EventRequestRepo eventRequestRepo;
     private final EventRequestStatsRepo eventRequestStatsRepo;
 
@@ -183,6 +186,7 @@ public class UtilService {
 
     private Predicate fillPredicate(EventQFilter filter) {
         return QPredicates.builder()
+                .add(filter.getEventIds(), event.id::in)
                 .add(filter.getUserIds(), event.initiator.id::in)
                 .add(filter.getStates(), event.state.name::in)
                 .add(filter.getCategories(), event.category.id::in)
@@ -204,5 +208,18 @@ public class UtilService {
         if (filter.isOnlyAvailable()) {
             return event.state.id.in(2);
         } else return null;
+    }
+
+    public Map<Long, AdminComment> findByEventId(List<Event> events) {
+        List<AdminComment> comments = adminCommentRepo.findLastByEventIds(
+                events.stream()
+                        .filter(e -> e.getState().getName().equals(EventStates.CANCELED.name()))
+                        .collect(Collectors.toList())
+        );
+
+        return comments.stream()
+                .collect(
+                        Collectors.toMap(comment -> comment.getEvent().getId(), comment -> comment)
+                );
     }
 }
