@@ -1,0 +1,672 @@
+{
+  "info": {
+    "_postman_id": "f1986af6-705a-46bc-b492-a1d6455ac800",
+    "name": "Test Explore With Me - feature",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "26052426"
+  },
+  "item": [
+    {
+      "name": "User create",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 201\", function () {\r",
+              "    pm.expect(pm.response.code).to.be.oneOf([201]);\r",
+              "});\r",
+              "pm.test(\"Test create user\", function () {\r",
+              "    var jsonData = pm.response.json();\r",
+              "    pm.expect(jsonData.id, '\"id\" field').to.eql(1);\r",
+              "    pm.expect(jsonData.email, '\"email\" field').to.eql('ivan.petrov@practicummail.ru');\r",
+              "    pm.expect(jsonData.name, '\"name\" field').to.eql('Иван Петров');\r",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"email\": \"ivan.petrov@practicummail.ru\",\r\n  \"name\": \"Иван Петров\"\r\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/admin/users",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "admin",
+            "users"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Category create",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 201\", function () {\r",
+              "    pm.expect(pm.response.code).to.be.oneOf([201]);\r",
+              "});\r",
+              "pm.test(\"Test create category\", function () {\r",
+              "    var jsonData = pm.response.json();\r",
+              "    pm.expect(jsonData.id, '\"id\" field').to.eql(1);\r",
+              "    pm.expect(jsonData.name, '\"name\" field').to.eql('Спорт');\r",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"name\": \"Спорт\"\r\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/admin/categories",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "admin",
+            "categories"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Event 1 Create",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 201\", function () {\r",
+              "    pm.expect(pm.response.code).to.be.oneOf([201]);\r",
+              "});\r",
+              "pm.test(\"Test create event\", function () {\r",
+              "    var jsonData = pm.response.json();\r",
+              "    pm.expect(jsonData.id, '\"id\" field').to.eql(1);\r",
+              "    pm.expect(jsonData.annotation, '\"annotation\" field').to.eql('Спорт - это жизнь.');\r",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"annotation\": \"Спорт - это жизнь.\",\r\n  \"category\": 1,\r\n  \"description\": \"Занятия спортом на свежем воздухе укрепляют здоровье, как физическое, так и моральное.\",\r\n  \"eventDate\": \"2024-12-31 15:10:05\",\r\n  \"location\": {\r\n    \"lat\": 55.754167,\r\n    \"lon\": 37.62\r\n  },\r\n  \"paid\": false,\r\n  \"participantLimit\": 10,\r\n  \"requestModeration\": false,\r\n  \"title\": \"Занимаемся спортом\"\r\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/users/1/events",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "users",
+            "1",
+            "events"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Event 2 Create",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 201\", function () {\r",
+              "    pm.expect(pm.response.code).to.be.oneOf([201]);\r",
+              "});\r",
+              "pm.test(\"Test create event\", function () {\r",
+              "    var jsonData = pm.response.json();\r",
+              "    pm.expect(jsonData.id, '\"id\" field').to.eql(2);\r",
+              "    pm.expect(jsonData.annotation, '\"annotation\" field').to.eql('Спорт - это жизнь.');\r",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"annotation\": \"Спорт - это жизнь.\",\r\n  \"category\": 1,\r\n  \"description\": \"Мы будем глазеть на то, как группа 1 занимается спортом.\",\r\n  \"eventDate\": \"2024-12-31 15:10:05\",\r\n  \"location\": {\r\n    \"lat\": 55.754167,\r\n    \"lon\": 37.62\r\n  },\r\n  \"paid\": true,\r\n  \"participantLimit\": 10,\r\n  \"requestModeration\": true,\r\n  \"title\": \"Занимаемся спортом\"\r\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/users/1/events",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "users",
+            "1",
+            "events"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Get all events waiting moderation",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {\r",
+              "    pm.expect(pm.response.code).to.be.oneOf([200]);\r",
+              "});\r",
+              "pm.test(\"Test get waiting\", function () {\r",
+              "    var jsonData = pm.response.json();\r",
+              "    pm.expect(jsonData.length, 'items count in total').to.eql(2);\r",
+              "    pm.expect(jsonData[0].id, 'result[0]: \"id\" field').to.eql(1);\r",
+              "    pm.expect(jsonData[1].id, 'result[1]: \"id\" field').to.eql(2);\r",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/admin/events/moderation",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "admin",
+            "events",
+            "moderation"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Moderate events",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {\r",
+              "    pm.expect(pm.response.code).to.be.oneOf([200]);\r",
+              "});\r",
+              "pm.test(\"Test moderation result\", function () {\r",
+              "    var jsonData = pm.response.json();\r",
+              "    pm.expect(jsonData.length, 'items count in total').to.eql(2);\r",
+              "    pm.expect(jsonData[0].id, 'result[0]: \"id\" field').to.eql(1);\r",
+              "    pm.expect(jsonData[0].state, 'result[0]: \"state\" field').to.eql('CANCELED');\r",
+              "    pm.expect(jsonData[1].id, 'result[0]: \"id\" field').to.eql(2);\r",
+              "    pm.expect(jsonData[1].state, 'result[0]: \"state\" field').to.eql('PUBLISHED');\r",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "[\r\n    {\r\n        \"id\": 1,\r\n        \"stateAction\": \"REJECT_EVENT\",\r\n        \"comment\": \"Для занятий спортом требуется справка от врача, ввести модерацию запросов\"\r\n    },\r\n    {\r\n        \"id\": 2,\r\n        \"stateAction\": \"PUBLISH_EVENT\"\r\n    }\r\n]"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/admin/events/moderation",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "admin",
+            "events",
+            "moderation"
+          ],
+          "query": [
+            {
+              "key": "",
+              "value": null,
+              "disabled": true
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Get event 1 by creator",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {\r",
+              "    pm.expect(pm.response.code).to.be.oneOf([200]);\r",
+              "});\r",
+              "pm.test(\"Test get by creator\", function () {\r",
+              "    var jsonData = pm.response.json();\r",
+              "    pm.expect(jsonData.id, '\"id\" field').to.eql(1);\r",
+              "    pm.expect(jsonData.comment, '\"comment\" field').not.null;\r",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/users/1/events/1",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "users",
+            "1",
+            "events",
+            "1"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Event 1 update by creator",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 201\", function () {\r",
+              "    pm.expect(pm.response.code).to.be.oneOf([200]);\r",
+              "});\r",
+              "pm.test(\"Test create event\", function () {\r",
+              "    var jsonData = pm.response.json();\r",
+              "    pm.expect(jsonData.id, '\"id\" field').to.eql(1);\r",
+              "    pm.expect(jsonData.annotation, '\"annotation\" field').to.eql('Спорт - это жизнь.');\r",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"requestModeration\": true,\r\n  \"stateAction\": \"SEND_TO_REVIEW\",\r\n  \"title\": \"Занимаемся спортом\"\r\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/users/1/events/1",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "users",
+            "1",
+            "events",
+            "1"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Get all events waiting moderation 2",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {\r",
+              "    pm.expect(pm.response.code).to.be.oneOf([200]);\r",
+              "});\r",
+              "pm.test(\"Test get waiting\", function () {\r",
+              "    var jsonData = pm.response.json();\r",
+              "    pm.expect(jsonData.length, 'items count in total').to.eql(1);\r",
+              "    pm.expect(jsonData[0].id, 'result[0]: \"id\" field').to.eql(1);\r",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/admin/events/moderation",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "admin",
+            "events",
+            "moderation"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Moderate events 2",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {\r",
+              "    pm.expect(pm.response.code).to.be.oneOf([200]);\r",
+              "});\r",
+              "pm.test(\"Test moderation result\", function () {\r",
+              "    var jsonData = pm.response.json();\r",
+              "    pm.expect(jsonData.id, '\"id\" field').to.eql(1);\r",
+              "    pm.expect(jsonData.state, '\"state\" field').to.eql('CANCELED');\r",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"id\": 1,\r\n    \"stateAction\": \"REJECT_EVENT\",\r\n    \"comment\": \"Ввести более подробное описание занятий\"\r\n}\r\n"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/admin/events/1",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "admin",
+            "events",
+            "1"
+          ],
+          "query": [
+            {
+              "key": "",
+              "value": null,
+              "disabled": true
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Get event 1 by creator Copy",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {\r",
+              "    pm.expect(pm.response.code).to.be.oneOf([200]);\r",
+              "});\r",
+              "pm.test(\"Test get by creator\", function () {\r",
+              "    var jsonData = pm.response.json();\r",
+              "    pm.expect(jsonData.id, '\"id\" field').to.eql(1);\r",
+              "    pm.expect(jsonData.comment, '\"comment\" field').not.null;\r",
+              "    pm.expect(jsonData.comment.commentId, '\"comment.id\" field').to.eql(2);\r",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/users/1/events/1",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "users",
+            "1",
+            "events",
+            "1"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Event 1 update by creator 2",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 201\", function () {\r",
+              "    pm.expect(pm.response.code).to.be.oneOf([200]);\r",
+              "});\r",
+              "pm.test(\"Test create event\", function () {\r",
+              "    var jsonData = pm.response.json();\r",
+              "    pm.expect(jsonData.id, '\"id\" field').to.eql(1);\r",
+              "    pm.expect(jsonData.annotation, '\"annotation\" field').to.eql('Спорт - это жизнь.');\r",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"requestModeration\": true,\r\n  \"stateAction\": \"SEND_TO_REVIEW\",\r\n  \"description\": \"Занятия спортом на свежем воздухе укрепляют здоровье, как физическое, так и моральное и позволяют обрести гармонию с собой\"\r\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/users/1/events/1",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "users",
+            "1",
+            "events",
+            "1"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Moderate events 2 Copy",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {\r",
+              "    pm.expect(pm.response.code).to.be.oneOf([200]);\r",
+              "});\r",
+              "pm.test(\"Test moderation result\", function () {\r",
+              "    var jsonData = pm.response.json();\r",
+              "    pm.expect(jsonData.id, '\"id\" field').to.eql(1);\r",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"id\": 1,\r\n    \"stateAction\": \"PUBLISH_EVENT\"\r\n}\r\n"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/admin/events/1",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "admin",
+            "events",
+            "1"
+          ],
+          "query": [
+            {
+              "key": "",
+              "value": null,
+              "disabled": true
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Get all events waiting moderation 3",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {\r",
+              "    pm.expect(pm.response.code).to.be.oneOf([200]);\r",
+              "});\r",
+              "pm.test(\"Test get waiting\", function () {\r",
+              "    var jsonData = pm.response.json();\r",
+              "    pm.expect(jsonData.length, 'items count in total').to.eql(0);\r",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/admin/events/moderation",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "admin",
+            "events",
+            "moderation"
+          ]
+        }
+      },
+      "response": []
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080",
+      "type": "string"
+    }
+  ]
+}

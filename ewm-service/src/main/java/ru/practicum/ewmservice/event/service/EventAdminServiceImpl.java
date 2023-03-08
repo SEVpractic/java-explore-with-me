@@ -60,7 +60,7 @@ public class EventAdminServiceImpl implements EventAdminService {
         List<Event> events;
 
         Pageable pageable = eventService.createPageableBySort(EventSorts.EVENT_DATE, 0, dto.size());
-        EventQFilter filter = fillFilter(null , null, null, null, null,
+        EventQFilter filter = fillFilter(null, null, null, null, null,
                 dto.stream().map(EventIncomeDto::getEventId).collect(Collectors.toList()));
         events = utilService.findByFilter(pageable, filter);
 
