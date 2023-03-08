@@ -50,6 +50,7 @@ public class EventAdminController {
     @GetMapping(path = "/moderation")
     public List<EventFullDto> findWaiting(@RequestParam(name = "from", defaultValue = "0") @PositiveOrZero int from,
                                           @RequestParam(name = "size", defaultValue = "10") @Positive int size) {
-        return eventAdminServiceService.getWaiting(from, size);
+        return eventAdminServiceService.getAll(null, List.of(EventStates.PENDING),
+                null, null, null, from, size);
     }
 }

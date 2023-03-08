@@ -48,17 +48,24 @@ public class EventAdminServiceImpl implements EventAdminService {
         comments = eventService.saveAdminComment(List.of(dto), List.of(event));
 
         log.info("Обновлено событие c id = {} администратором", eventId);
-        return EventMapper.toEventFullDto(event, confirmedRequests, views, comments); // todo map!
+        return EventMapper.toEventFullDto(event, confirmedRequests, views, comments);
     }
 
     @Override
     @Transactional
     public List<EventFullDto> updateAll(List<EventIncomeDto> dto) {
         Map<Long, AdminComment> comments;
-        List<Event> events = getAll(dto.stream().map(EventIncomeDto::getEventId).collect(Collectors.toList()),
-                null, null, null, null, null, 0, dto.size());
-        Map<Long, Integer> views = utilService.findViews(events);
-        Map<Event, List<EventRequest>> confirmedRequests = utilService.findConfirmedRequests(events);
+        Map<Long, Integer> views;
+        Map<Event, List<EventRequest>> confirmedRequests;
+        List<Event> events;
+
+        Pageable pageable = eventService.createPageableBySort(EventSorts.EVENT_DATE, 0, dto.size());
+        EventQFilter filter = fillFilter(null , null, null, null, null,
+                dto.stream().map(EventIncomeDto::getEventId).collect(Collectors.toList()));
+        events = utilService.findByFilter(pageable, filter);
+
+        views = utilService.findViews(events);
+        confirmedRequests = utilService.findConfirmedRequests(events);
 
         Map<Long, EventIncomeDto> dtoMap = dto.stream().collect(toMap(EventIncomeDto::getEventId, i -> i));
         events.forEach(event -> eventService.update(event, dtoMap.get(event.getId())));
@@ -66,7 +73,7 @@ public class EventAdminServiceImpl implements EventAdminService {
         comments = eventService.saveAdminComment(dto, events);
 
         log.info("Обновлен перечень событий администратором");
-        return EventMapper.toEventFullDto(events, confirmedRequests, views, comments); // todo map!
+        return EventMapper.toEventFullDto(events, confirmedRequests, views, comments);
     }
 
     @Override
@@ -76,41 +83,21 @@ public class EventAdminServiceImpl implements EventAdminService {
                                      LocalDateTime rangeStart,
                                      LocalDateTime rangeEnd,
                                      int from, int size) {
-        List<Event> events = getAll(null, userIds, states, categories, rangeStart, rangeEnd, from, size);
-        Map<Long, Integer> views = utilService.findViews(events);
-        Map<Event, List<EventRequest>> confirmedRequests = utilService.findConfirmedRequests(events);
-        Map<Long, AdminComment> comments = utilService.findByEventId(events);
-
-        log.info("Возвращаю список событий по запросу администратора");
-        return EventMapper.toEventFullDto(events, confirmedRequests, views, comments); // todo map!
-    }
-
-    @Override
-    public List<EventFullDto> getWaiting(int from, int size) { // todo убрать метод, переделать запрос из контроллера
-        List<Event> events = getAll(null, null, List.of(EventStates.PENDING),
-                null, null, null, from, size);
-        Map<Long, Integer> views = utilService.findViews(events);
-        Map<Event, List<EventRequest>> confirmedRequests = utilService.findConfirmedRequests(events);
-
-        log.info("Возвращаю список событий по запросу администратора");
-        return EventMapper.toEventFullDto(events, confirmedRequests, views, Map.of());
-    }
-
-    private List<Event> getAll(List<Long> eventIds,
-                               List<Long> userIds,
-                               List<EventStates> states,
-                               List<Long> categories,
-                               LocalDateTime rangeStart,
-                               LocalDateTime rangeEnd,
-                               int from, int size) {
         List<Event> events;
+        Map<Long, Integer> views;
+        Map<Event, List<EventRequest>> confirmedRequests;
+        Map<Long, AdminComment> comments;
 
         Pageable pageable = eventService.createPageableBySort(EventSorts.EVENT_DATE, from, size);
-        EventQFilter filter = fillFilter(userIds, states, categories, rangeStart, rangeEnd, eventIds);
+        EventQFilter filter = fillFilter(userIds, states, categories, rangeStart, rangeEnd, null);
 
         events = utilService.findByFilter(pageable, filter);
+        views = utilService.findViews(events);
+        confirmedRequests = utilService.findConfirmedRequests(events);
+        comments = utilService.findByEventId(events);
 
-        return events;
+        log.info("Возвращаю список событий по запросу администратора");
+        return EventMapper.toEventFullDto(events, confirmedRequests, views, comments);
     }
 
     private EventQFilter fillFilter(List<Long> userIds,

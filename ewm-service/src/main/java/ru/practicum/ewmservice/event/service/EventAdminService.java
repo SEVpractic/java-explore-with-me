@@ -18,8 +18,6 @@ public interface EventAdminService {
                               LocalDateTime rangeEnd,
                               int from, int size);
 
-    List<EventFullDto> getWaiting(int from, int size);
-
     List<EventFullDto> updateAll(List<EventIncomeDto> dto);
 
 }
