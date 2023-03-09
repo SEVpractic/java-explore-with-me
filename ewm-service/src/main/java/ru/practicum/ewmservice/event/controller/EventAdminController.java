@@ -29,7 +29,7 @@ public class EventAdminController {
         return eventAdminServiceService.update(dto, eventId);
     }
 
-    @PostMapping(path = "/moderation")
+    @PatchMapping(path = "/moderation")
     public List<EventFullDto> updateAll(@Validated(AdminValidationGroup.class) @RequestBody List<EventIncomeDto> dto) {
         return eventAdminServiceService.updateAll(dto);
     }
