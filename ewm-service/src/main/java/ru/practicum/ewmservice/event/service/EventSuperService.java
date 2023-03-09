@@ -125,14 +125,16 @@ public class EventSuperService {
     }
 
     public Map<Long, AdminComment> saveAdminComment(List<EventIncomeDto> dto, List<Event> events) {
-        Map<Long, Event> eventsBeId = events.stream().collect(Collectors.toMap(Event::getId, e -> e));
+        if (events.isEmpty()) return Map.of();
+
+        Map<Long, Event> eventsById = events.stream().collect(Collectors.toMap(Event::getId, e -> e));
         dto = dto.stream()
                 .filter(d -> d.getStateAction() != null)
                 .filter(d -> d.getStateAction().equals(StateActions.REJECT_EVENT))
                 .filter(d -> d.getComment() != null && !d.getComment().isBlank())
                 .collect(Collectors.toList());
 
-        List<AdminComment> comments = AdminCommentMapper.toAdminComment(dto, eventsBeId);
+        List<AdminComment> comments = AdminCommentMapper.toAdminComment(dto, eventsById);
         comments.forEach(comment -> comment.setCreatedOn(LocalDateTime.now()));
 
         comments = commentRepo.saveAll(comments);
