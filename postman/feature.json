@@ -64,7 +64,7 @@
         ],
         "body": {
           "mode": "raw",
-          "raw": "[\r\n    {\r\n        \"id\": 1,\r\n        \"stateAction\": \"REJECT_EVENT\",\r\n        \"comment\": \"comment text\"\r\n    },\r\n    {\r\n        \"id\": 2,\r\n        \"stateAction\": \"PUBLISH_EVENT\"\r\n    }\r\n]"
+          "raw": "[\r\n    {\r\n        \"id\": 2,\r\n        \"stateAction\": \"REJECT_EVENT\",\r\n        \"comment\": \"comment text\"\r\n    },\r\n    {\r\n        \"id\": 4,\r\n        \"stateAction\": \"PUBLISH_EVENT\"\r\n    }\r\n]"
         },
         "url": {
           "raw": "{{baseUrl}}/admin/events/moderation",
