@@ -5,6 +5,7 @@ import ru.practicum.ewmservice.categories.model.Category;
 import ru.practicum.ewmservice.event.dto.EventFullDto;
 import ru.practicum.ewmservice.event.dto.EventIncomeDto;
 import ru.practicum.ewmservice.event.dto.EventShortDto;
+import ru.practicum.ewmservice.event.model.AdminComment;
 import ru.practicum.ewmservice.event.model.Event;
 import ru.practicum.ewmservice.event.model.Location;
 import ru.practicum.ewmservice.participation_request.model.EventRequest;
@@ -35,7 +36,8 @@ public class EventMapper {
 
     public static EventFullDto toEventFullDto(Event event,
                                               List<EventRequest> confirmedRequests,
-                                              Map<Long, Integer> views) {
+                                              Map<Long, Integer> views,
+                                              Map<Long, AdminComment> comments) {
         return EventFullDto.builder()
                 .id(event.getId())
                 .annotation(event.getAnnotation())
@@ -53,17 +55,23 @@ public class EventMapper {
                 .state(event.getState().getName())
                 .title(event.getTitle())
                 .views(views.getOrDefault(event.getId(), 0))
+                .comment(
+                        comments.containsKey(event.getId()) ?
+                                AdminCommentMapper.toAdminCommentDto(comments.get(event.getId())) : null
+                )
                 .build();
     }
 
     public static List<EventFullDto> toEventFullDto(List<Event> events,
                                                     Map<Event, List<EventRequest>> confirmedRequests,
-                                                    Map<Long, Integer> views) {
+                                                    Map<Long, Integer> views,
+                                                    Map<Long, AdminComment> comments) {
         return events.stream()
                 .map(event -> toEventFullDto(
                         event,
                         confirmedRequests.getOrDefault(event, List.of()),
-                        views
+                        views,
+                        comments
                 ))
                 .collect(Collectors.toList());
     }

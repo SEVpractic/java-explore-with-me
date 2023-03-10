@@ -17,4 +17,7 @@ public interface EventAdminService {
                               LocalDateTime rangeStart,
                               LocalDateTime rangeEnd,
                               int from, int size);
+
+    List<EventFullDto> updateAll(List<EventIncomeDto> dto);
+
 }

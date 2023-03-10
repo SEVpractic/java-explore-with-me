@@ -9,6 +9,7 @@ import java.util.List;
 @Builder
 @Getter
 public class EventQFilter {
+    private final List<Long> eventIds;
     private final List<Long> userIds;
     private  final List<String> states;
     private final String text;

@@ -8,6 +8,7 @@ import ru.practicum.ewmservice.event.dto.EventFullDto;
 import ru.practicum.ewmservice.event.dto.EventIncomeDto;
 import ru.practicum.ewmservice.event.model.EventStates;
 import ru.practicum.ewmservice.event.service.EventAdminService;
+import ru.practicum.ewmservice.util.validation.AdminValidationGroup;
 import ru.practicum.ewmservice.util.validation.UpdateValidationGroup;
 
 import javax.validation.constraints.Positive;
@@ -28,6 +29,11 @@ public class EventAdminController {
         return eventAdminServiceService.update(dto, eventId);
     }
 
+    @PatchMapping(path = "/moderation")
+    public List<EventFullDto> updateAll(@Validated(AdminValidationGroup.class) @RequestBody List<EventIncomeDto> dto) {
+        return eventAdminServiceService.updateAll(dto);
+    }
+
     @GetMapping
     public List<EventFullDto> findByFilter(@RequestParam(name = "users", required = false) List<Long> userIds,
                                            @RequestParam(name = "states", required = false) List<EventStates> states,
@@ -39,5 +45,12 @@ public class EventAdminController {
                                            @RequestParam(name = "from", defaultValue = "0") @PositiveOrZero int from,
                                            @RequestParam(name = "size", defaultValue = "10") @Positive int size) {
         return eventAdminServiceService.getAll(userIds, states, categories, rangeStart, rangeEnd, from, size);
+    }
+
+    @GetMapping(path = "/moderation")
+    public List<EventFullDto> findWaiting(@RequestParam(name = "from", defaultValue = "0") @PositiveOrZero int from,
+                                          @RequestParam(name = "size", defaultValue = "10") @Positive int size) {
+        return eventAdminServiceService.getAll(null, List.of(EventStates.PENDING),
+                null, null, null, from, size);
     }
 }
