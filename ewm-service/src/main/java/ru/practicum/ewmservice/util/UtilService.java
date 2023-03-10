@@ -211,7 +211,7 @@ public class UtilService {
     }
 
     public Map<Long, AdminComment> findByEventId(List<Event> events) {
-        List<AdminComment> comments = adminCommentRepo.findLastByEventIds(
+        List<AdminComment> comments = adminCommentRepo.findFirstByEventInOrderByCreatedOnDesc(
                 events.stream()
                         .filter(e -> e.getState().getName().equals(EventStates.CANCELED.name()))
                         .collect(Collectors.toList())

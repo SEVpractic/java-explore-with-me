@@ -129,9 +129,7 @@ public class EventSuperService {
 
         Map<Long, Event> eventsById = events.stream().collect(Collectors.toMap(Event::getId, e -> e));
         dto = dto.stream()
-                .filter(d -> d.getStateAction() != null)
-                .filter(d -> d.getStateAction().equals(StateActions.REJECT_EVENT))
-                .filter(d -> d.getComment() != null && !d.getComment().isBlank())
+                .filter(this::isPossibleToComment)
                 .collect(Collectors.toList());
 
         List<AdminComment> comments = AdminCommentMapper.toAdminComment(dto, eventsById);
@@ -147,5 +145,12 @@ public class EventSuperService {
                             Collectors.toMap(comment -> comment.getEvent().getId(), comment -> comment)
                     );
         }
+    }
+
+    private boolean isPossibleToComment(EventIncomeDto dto) {
+        return dto.getStateAction() != null
+                && dto.getStateAction().equals(StateActions.REJECT_EVENT)
+                && dto.getComment() != null
+                && !dto.getComment().isBlank();
     }
 }
